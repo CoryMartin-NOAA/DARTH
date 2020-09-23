@@ -1,3 +1,4 @@
+# borrowed from hpc-stack / rahul.mahajan
 function parse_yaml {
   set +x
   local yamlprefix=$2

@@ -1,6 +1,22 @@
-gfs:
-  analysis time: 2020092312
+time:
+  year: 2020
+  month: 09
+  day: 23
+  cycle: 12
 
-obs:
-  - prepbufr
-  - amsua
+background:
+  jcap: 766
+  jcap_b: 1534
+  levs: 64
+  guessdir: /scratch1/NCEPDEV/rstprod/com/gfs/prod
+  format: nemsio
+
+observations:
+  obsdir: /scratch1/NCEPDEV/rstprod/com/gfs/prod
+  dump: gdas
+  restricted: TRUE
+
+observer:
+  workdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/work
+  gsidir: /scratch1/NCEPDEV/da/Cory.R.Martin/Workflows/GFSv16/sorc/gsi.fd
+  outputdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/output
