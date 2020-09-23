@@ -484,5 +484,9 @@ cp gsistat ${GSI_observer_outputdir}/gsistat.ops.$adate
 cp gsistat.out ${GSI_observer_outputdir}/gsistat.$adate
 cp gsi.stdout ${GSI_observer_outputdir}/stdout.$adate
 
+if [[ "$GSI_observer_cleanup" = "TRUE" ]]; then
+  cd $GSI_observer_outputdir
+  rm -rf $GSI_observer_workdir
+fi
 date
 echo "GSI observer script completed"

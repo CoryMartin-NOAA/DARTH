@@ -20,6 +20,7 @@ observer:
   workdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/work
   gsidir: /scratch1/NCEPDEV/da/Cory.R.Martin/Workflows/GFSv16/sorc/gsi.fd
   outputdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/output
+  cleanup: TRUE
 
 env:
   launcher: "srun --export=ALL"
