@@ -1,0 +1,6 @@
+gfs:
+  analysis time: 2020092312
+
+obs:
+  - prepbufr
+  - amsua
