@@ -7,12 +7,21 @@
 import argparse
 import yaml
 
+def gen_batch(yamlconfig):
+    """
+    Use YAML input to generate batch job submission scripts
+    """
+
+def main(yamlconfig):
+    gen_batch(yamlconfig)
+
 parser = argparse.ArgumentParser(description='Generate YAML, other scripts, etc.'+\
                                 ' to process a global analysis cycle and produce output')
 parser.add_argument('-y', '--yaml', type=str,
                     help='path to YAML file for this analysis cycle', required=True)
 args = parser.parse_args()
 YAML = args.yaml
-yamlconfig = yaml.load(YAML, Loader=yaml.FullLoader)
+with open(YAML, 'r') as stream:
+    yamlconfig = yaml.safe_load(stream)
 
-print(yamlconfig)
+main(yamlconfig)
