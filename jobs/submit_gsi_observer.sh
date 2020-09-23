@@ -11,4 +11,4 @@ ScriptDir=/scratch1/NCEPDEV/da/Cory.R.Martin/GitHub/DARTH/scripts
 
 cd $ScriptDir
 
-./run_gsi_observer.sh test.yaml
+./run_gsi_observer.sh ../parm/sample_gsi_obs.yaml

@@ -422,8 +422,67 @@ cat gsiparm.anl
 
 ## run GSI observer
 export OMP_NUM_THREADS=$GSI_env_nthreads
-$APRUN_GSI ./gsi.x
+$APRUN_GSI ./gsi.x > gsi.stdout
 
 ## cat diags
+ntype=3
+numfile[0]=0
+numfile[1]=0
+numfile[2]=0
+numfile[3]=0
+diagtype[0]="conv conv_gps conv_ps conv_q conv_sst conv_t conv_uv"
+diagtype[1]="pcp_ssmi_dmsp pcp_tmi_trmm"
+diagtype[2]="sbuv2_n16 sbuv2_n17 sbuv2_n18 sbuv2_n19 gome_metop-a gome_metop-b omi_aura mls30_aura ompsnp_npp
+ompstc8_npp"
+diagtype[3]="hirs2_n14 msu_n14 sndr_g08 sndr_g11 sndr_g12 sndr_g13 sndr_g08_prep sndr_g11_prep sndr_g12_prep
+sndr_g13_prep sndrd1_g11 sndrd2_g11 sndrd3_g11 sndrd4_g11 sndrd1_g12 sndrd2_g12 sndrd3_g12 sndrd4_g12 sndrd1_g13
+sndrd2_g13 sndrd3_g13 sndrd4_g13 sndrd1_g14 sndrd2_g14 sndrd3_g14 sndrd4_g14 sndrd1_g15 sndrd2_g15 sndrd3_g15 sndrd4_g15
+hirs3_n15 hirs3_n16 hirs3_n17 amsua_n15 amsua_n16 amsua_n17 amsub_n15 amsub_n16 amsub_n17 hsb_aqua airs_aqua amsua_aqua
+imgr_g08 imgr_g11 imgr_g12 imgr_g14 imgr_g15 ssmi_f13 ssmi_f15 hirs4_n18 hirs4_metop-a amsua_n18 amsua_metop-a mhs_n18
+mhs_metop-a amsre_low_aqua amsre_mid_aqua amsre_hig_aqua ssmis_f16 ssmis_f17 ssmis_f18 ssmis_f19 ssmis_f20 iasi_metop-a
+hirs4_n19 amsua_n19 mhs_n19 seviri_m08 seviri_m09 seviri_m10 seviri_m11 cris_npp cris-fsr_npp cris-fsr_n20 atms_npp
+atms_n20 hirs4_metop-b amsua_metop-b mhs_metop-b iasi_metop-b amsua_metop-c mhs_metop-c avhrr_n18 avhrr_metop-a amsr2_gcom-w1 gmi_gpm
+saphir_meghat ahi_himawari8"
+
+prefix=" dir.*/"
+loops="01"
+for loop in $loops; do
+   case $loop in
+      01) string=ges;;
+      03) string=anl;;
+       *) string=$loop;;
+   esac
+   echo $(date) START loop $string >&2
+   n=-1
+   while [ $((n+=1)) -le $ntype ] ;do
+      for type in $(echo ${diagtype[n]}); do
+         count=$(ls ${prefix}${type}_${loop}* | wc -l)
+         if [ $count -gt 0 ]; then
+	          file=diag_${type}_${string}.${adate}_ensmean.nc4 # _ensmean is to work with python script
+	          # note if the GSI utility is not working correctly, use the python version
+	          # same syntax is used to call it, just change what $nccat is
+            $nccat -o $file ${prefix}${type}_${loop}.nc4 &
+            sleep 5
+            echo "diag_${type}_${string}.${adate}*" >> ${diaglist[n]}
+            numfile[n]=$(expr ${numfile[n]} + 1)
+         fi
+      done
+   done
+   echo $(date) END loop $string >&2
+done
+wait
+
+cat `echo fort.*` > gsistat.out
 
 ## move files to output directory
+mkdir -p $GSI_observer_outputdir
+mv diag_* $GSI_observer_outputdir
+cp satbias_in ${GSI_observer_outputdir}/satbias.$gdate
+cp satbias_pc ${GSI_observer_outputdir}/satbias_pc.$gdate
+cp aircftbias_in ${GSI_observer_outputdir}/aircftbias.$gdate
+cp gsistat ${GSI_observer_outputdir}/gsistat.ops.$adate
+cp gsistat.out ${GSI_observer_outputdir}/gsistat.$adate
+cp gsi.stdout ${GSI_observer_outputdir}/stdout.$adate
+
+date
+echo "GSI observer script completed"
