@@ -10,6 +10,7 @@ background:
   levs: 64
   guessdir: /scratch1/NCEPDEV/rstprod/com/gfs/prod
   format: nemsio
+  gfsv16: TRUE
 
 observations:
   obsdir: /scratch1/NCEPDEV/rstprod/com/gfs/prod

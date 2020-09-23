@@ -47,12 +47,17 @@ gdate=`$NDATE -06 $adate`
 PDYg=`echo $gdate | cut -c1-8`
 cycg=`echo $gdate | cut -c9-10`
 
+## GFSv16 adds /atmos/ to the guess dir
+if [[ "$GSI_background_gfsv16" = "TRUE" ]]; then
+  atmos=atmos
+fi
+
 ## variables for other useful paths
 fixgsi=$GSIDIR/fix
 ushgsi=$GSIDIR/ush
 crtm_coeffs=./crtm_coeffs/
 datobs=$GSI_observations_obsdir/${GSI_observations_dump}.$PDYa/$cyca
-datges=$GSI_background_guessdir/${GSI_observations_dump}.$PDYg/$cycg
+datges=$GSI_background_guessdir/${GSI_observations_dump}.$PDYg/$cycg/$atmos
 prefix_obs=${GSI_observations_dump}.t${cyca}z
 prefix_ges=${GSI_observations_dump}.t${cycg}z
 suffix=tm00.bufr_d
