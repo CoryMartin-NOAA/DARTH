@@ -2,7 +2,7 @@ time:
   year: 2020
   month: 09
   day: 23
-  cycle: 12
+  cycle: 06
 
 background:
   jcap: 766
@@ -20,3 +20,7 @@ observer:
   workdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/work
   gsidir: /scratch1/NCEPDEV/da/Cory.R.Martin/Workflows/GFSv16/sorc/gsi.fd
   outputdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/output
+
+env:
+  launcher: "srun --export=ALL"
+  nthreads: 1

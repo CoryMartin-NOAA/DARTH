@@ -29,6 +29,9 @@ source $USHDIR/get_lonlat_jcap.sh
 export GSIDIR=$GSI_observer_gsidir
 source $USHDIR/load_modules_gsi.sh
 
+## load env vars as needed
+export APRUN_GSI=$GSI_env_launcher
+
 ## variables for executables
 gsiexec=$GSIDIR/exec/global_gsi.x
 nccat=$GSIDIR/exec/nc_diag_cat_serial.x
@@ -48,8 +51,8 @@ cycg=`echo $gdate | cut -c9-10`
 fixgsi=$GSIDIR/fix
 ushgsi=$GSIDIR/ush
 crtm_coeffs=./crtm_coeffs/
-datobs=$ObsDir/${GSI_observations_dump}.$PDYa/$cyca
-datges=$GuessDir/${GSI_observations_dump}.$PDYg/$cycg
+datobs=$GSI_observations_obsdir/${GSI_observations_dump}.$PDYa/$cyca
+datges=$GSI_background_guessdir/${GSI_observations_dump}.$PDYg/$cycg
 prefix_obs=${GSI_observations_dump}.t${cyca}z
 prefix_ges=${GSI_observations_dump}.t${cycg}z
 suffix=tm00.bufr_d
@@ -242,7 +245,7 @@ cat > gsiparm.anl << EOF
   $SETUP
 /
 &GRIDOPTS
-  JCAP_B=$JCAP,JCAP=$JCAP_A,NLAT=$NLAT_A,NLON=$NLON_A,nsig=$LEVS,
+  JCAP_B=$JCAP_B,JCAP=$JCAP,NLAT=$NLAT,NLON=$NLON,nsig=$LEVS,
   regional=.false.,nlayers(63)=3,nlayers(64)=6,
   $GRIDOPTS
 /
@@ -270,7 +273,7 @@ cat > gsiparm.anl << EOF
 /
 &OBSQC
   dfact=0.75,dfact1=3.0,noiqc=.true.,oberrflg=.false.,c_varqc=0.02,
-  use_poq7=.true.,qc_noirjaco3_pole=.true.,vqc=.false.,nvqc=.true.,
+  use_poq7=.true.,qc_noirjaco3_pole=.true.,vqc=.true.,nvqc=.false.,
   aircraft_t_bc=.true.,biaspredt=1.0e5,upd_aircraft=.true.,cleanup_tail=.true.,
   tcp_width=70.0,tcp_ermax=7.35,
   $OBSQC
@@ -418,7 +421,7 @@ EOF
 cat gsiparm.anl
 
 ## run GSI observer
-export OMP_NUM_THREADS=$NTHREADS_GSI
+export OMP_NUM_THREADS=$GSI_env_nthreads
 $APRUN_GSI ./gsi.x
 
 ## cat diags
