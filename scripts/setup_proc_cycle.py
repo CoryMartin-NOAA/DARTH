@@ -76,7 +76,7 @@ def main(yamlconfig):
         gsiconfig['cleanup'] = yamlconfig['cleanup']
         # create YAML for GSI observer script
         gsiobsyaml = gen_gsi_observer_yaml(gsiconfig)
-        print('GSI observer configuration YAML file written to :'+gsiobsyaml)
+        print('GSI observer configuration YAML file written to: '+gsiobsyaml)
         # create batch submission script
         if 'slurm' in gsiconfig: # only support slurm currently
             slurmdict = gsiconfig['slurm']
@@ -85,7 +85,7 @@ def main(yamlconfig):
             slurmdict['jobscript'] = rootdir + '/scripts/%s.sh' % (slurmdict['job'])
             slurmdict['validtime'] = validtime
             gsibatch = gen_slurm_submit(slurmdict)
-            print('GSI observer sbatch submission file written to :'+gsibatch)
+            print('GSI observer sbatch submission file written to: '+gsibatch)
         # TODO add other batch systems (lsf for wcoss)
     # TODO add JEDI things
     # TODO add plotting / analysis things

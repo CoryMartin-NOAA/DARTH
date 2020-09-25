@@ -27,7 +27,9 @@ source $USHDIR/get_lonlat_jcap.sh
 
 ## load modules for GSI
 export GSIDIR=$GSI_observer_gsidir
+set +x
 source $USHDIR/load_modules_gsi.sh
+set -x
 
 ## load env vars as needed
 export APRUN_GSI=$GSI_env_launcher
@@ -480,6 +482,9 @@ wait
 cat `echo fort.*` > gsistat.out
 
 ## move files to output directory
+if [[ "$GSI_observer_cleanup" = "true" ]]; then
+  rm -rf $GSI_observer_outputdir
+fi
 mkdir -p $GSI_observer_outputdir
 mv diag_* $GSI_observer_outputdir
 cp satbias_in ${GSI_observer_outputdir}/satbias.$gdate
