@@ -482,6 +482,9 @@ wait
 cat `echo fort.*` > gsistat.out
 
 ## move files to output directory
+if [[ "$GSI_observer_cleanup" = "true" ]]; then
+  rm -rf $GSI_observer_outputdir
+fi
 mkdir -p $GSI_observer_outputdir
 mv diag_* $GSI_observer_outputdir
 cp satbias_in ${GSI_observer_outputdir}/satbias.$gdate
