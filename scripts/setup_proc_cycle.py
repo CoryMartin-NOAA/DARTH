@@ -36,6 +36,8 @@ def gen_gsi_observer_yaml(gsiconfig):
     """
     generate YAML for use by run_gsi_observer.sh
     """
+    timestr = gsiconfig['validtime'].strftime('%Y%m%d%H')
+    yamlpath = gsiconfig['gsiwork'] + '/run_gsi_observer_%s.yaml' % (timestr)
     # set up an output dictionary, then use pyYAML to write it out
     yamlout = {}
     yamlout['time'] = {
@@ -45,8 +47,18 @@ def gen_gsi_observer_yaml(gsiconfig):
                        'cycle': gsiconfig['validtime'].strftime('%H'),
     }
     yamlout['background'] = gsiconfig['background']
-    timestr = gsiconfig['validtime'].strftime('%Y%m%d%H')
-    yamlpath = gsiconfig['gsiwork'] + '/run_gsi_observer_%s.yaml' % (timestr)
+    yamlout['observations'] = {
+                               'obsdir': gsiconfig['observations']['bufrdir'],
+                               'dump': gsiconfig['dump'],
+                               'restricted': gsiconfig['rstprod'],
+    }
+    yamlout['observer'] = {
+                           'workdir': '%s/%s' % (gsiconfig['gsiwork'],timestr),
+                           'gsidir': gsiconfig['gsidir'],
+                           'outputdir': '%s/%s' % (gsiconfig['gsiout'],timestr),
+                           'cleanup': gsiconfig['cleanup'],
+    }
+    yamlout['env'] = gsiconfig['env']
     with open(yamlpath, 'w') as file:
         yaml.dump(yamlout, file, default_flow_style=False)
     return yamlpath
@@ -61,6 +73,7 @@ def main(yamlconfig):
         gsiconfig['validtime'] = validtime
         gsiconfig['dump'] = yamlconfig['analysis cycle']['dump']
         gsiconfig['rstprod'] = yamlconfig['analysis cycle']['restricted data']
+        gsiconfig['cleanup'] = yamlconfig['cleanup']
         # create YAML for GSI observer script
         gsiobsyaml = gen_gsi_observer_yaml(gsiconfig)
         # create batch submission script
