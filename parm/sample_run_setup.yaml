@@ -1,7 +1,7 @@
 analysis cycle:
   time: 2020-09-23T18:00:00Z
   dump: gdas
-  restricted data: TRUE
+  restricted data: true
 
 gsi observer:
   background:
@@ -10,7 +10,7 @@ gsi observer:
     levs: 64
     guessdir: /scratch1/NCEPDEV/rstprod/com/gfs/prod
     format: nemsio
-    gfsv16: TRUE
+    gfsv16: true
   observations:
     bufrdir: /scratch1/NCEPDEV/rstprod/com/gfs/prod
   env:
@@ -27,4 +27,4 @@ gsi observer:
   gsiwork: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/work
   gsiout: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/output
 
-cleanup: TRUE
+cleanup: true

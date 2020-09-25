@@ -48,7 +48,7 @@ def gen_gsi_observer_yaml(gsiconfig):
     timestr = gsiconfig['validtime'].strftime('%Y%m%d%H')
     yamlpath = gsiconfig['gsiwork'] + '/run_gsi_observer_%s.yaml' % (timestr)
     with open(yamlpath, 'w') as file:
-        yaml.dump(yamlout, file)
+        yaml.dump(yamlout, file, default_flow_style=False)
     return yamlpath
 
 def main(yamlconfig):
