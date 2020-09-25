@@ -27,7 +27,9 @@ source $USHDIR/get_lonlat_jcap.sh
 
 ## load modules for GSI
 export GSIDIR=$GSI_observer_gsidir
+set +x
 source $USHDIR/load_modules_gsi.sh
+set -x
 
 ## load env vars as needed
 export APRUN_GSI=$GSI_env_launcher
