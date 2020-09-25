@@ -76,6 +76,7 @@ def main(yamlconfig):
         gsiconfig['cleanup'] = yamlconfig['cleanup']
         # create YAML for GSI observer script
         gsiobsyaml = gen_gsi_observer_yaml(gsiconfig)
+        print('GSI observer configuration YAML file written to :'+gsiobsyaml)
         # create batch submission script
         if 'slurm' in gsiconfig: # only support slurm currently
             slurmdict = gsiconfig['slurm']
