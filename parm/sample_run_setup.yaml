@@ -16,15 +16,14 @@ gsi observer:
   env:
     launcher: "srun --export=ALL"
     nthreads: 1
-  gsidir: /scratch1/NCEPDEV/da/Cory.R.Martin/Workflows/GFSv16/sorc/gsi.fd 
-
-slurm:
-  account: da-cpu
-  queue: debug
-  nodes: 30
-  taskspernode: 8
-
-directories:
+  gsidir: /scratch1/NCEPDEV/da/Cory.R.Martin/Workflows/GFSv16/sorc/gsi.fd
+  slurm:
+    account: da-cpu
+    queue: debug
+    nodes: 30
+    taskspernode: 8
+    maxtime: '00:30:00'
+    submitdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/work
   gsiwork: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/work
   gsiout: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/output
 
