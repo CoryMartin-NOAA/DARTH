@@ -48,7 +48,7 @@ PDYg=`echo $gdate | cut -c1-8`
 cycg=`echo $gdate | cut -c9-10`
 
 ## GFSv16 adds /atmos/ to the guess dir
-if [[ "$GSI_background_gfsv16" = "TRUE" ]]; then
+if [[ "$GSI_background_gfsv16" = "true" ]]; then
   atmos=atmos
 fi
 
@@ -142,7 +142,7 @@ $ncpc $aercoef           ${crtm_coeffs}AerosolCoeff.bin
 $ncpc $cldcoef           ${crtm_coeffs}CloudCoeff.bin
 
 ## copy observations
-if [[ "$GSI_observations_restricted" = "TRUE" ]]; then
+if [[ "$GSI_observations_restricted" = "true" ]]; then
   $ncpl $datobsnr/${prefix_obs}.prepbufr                ./prepbufr
 else
   $ncpl $datobs/${prefix_obs}.prepbufr.nr                ./prepbufr
@@ -489,7 +489,7 @@ cp gsistat ${GSI_observer_outputdir}/gsistat.ops.$adate
 cp gsistat.out ${GSI_observer_outputdir}/gsistat.$adate
 cp gsi.stdout ${GSI_observer_outputdir}/stdout.$adate
 
-if [[ "$GSI_observer_cleanup" = "TRUE" ]]; then
+if [[ "$GSI_observer_cleanup" = "true" ]]; then
   cd $GSI_observer_outputdir
   rm -rf $GSI_observer_workdir
 fi

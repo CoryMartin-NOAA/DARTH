@@ -10,18 +10,18 @@ background:
   levs: 64
   guessdir: /scratch1/NCEPDEV/rstprod/com/gfs/prod
   format: nemsio
-  gfsv16: TRUE
+  gfsv16: true
 
 observations:
   obsdir: /scratch1/NCEPDEV/rstprod/com/gfs/prod
   dump: gdas
-  restricted: TRUE
+  restricted: true
 
 observer:
   workdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/work
   gsidir: /scratch1/NCEPDEV/da/Cory.R.Martin/Workflows/GFSv16/sorc/gsi.fd
   outputdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/output
-  cleanup: TRUE
+  cleanup: true
 
 env:
   launcher: "srun --export=ALL"
