@@ -38,10 +38,11 @@ def main(yamlconfig):
     rootdir = '/'.join(mydir.split('/')[:-1])
     # run GSI observer if in YAML
     validtime = yamlconfig['analysis cycle']['time']
-    print(validtime)
     if 'gsi observer' in yamlconfig:
         gsiconfig = yamlconfig['gsi observer']
         gsiobsyaml = gsiconfig['gsiwork']+'/%s_gsi_observer.yaml' % (validtime.strftime('%Y%m%d%H'))
+        # create YAML for GSI observer script
+        # create batch submission script
         if 'slurm' in gsiconfig: # only support slurm currently
             slurmdict = gsiconfig['slurm']
             slurmdict['job'] = 'run_gsi_observer'
@@ -49,6 +50,10 @@ def main(yamlconfig):
             slurmdict['jobscript'] = rootdir + '/scripts/%s.sh' % (slurmdict['job'])
             slurmdict['validtime'] = validtime
             gsibatch = gen_slurm_submit(slurmdict)
+            print('GSI observer sbatch submission file written to :'+gsibatch)
+        # TODO add other batch systems (lsf for wcoss)
+    # TODO add JEDI things
+    # TODO add plotting / analysis things
 
 parser = argparse.ArgumentParser(description='Generate YAML, other scripts, etc.'+\
                                 ' to process a global analysis cycle and produce output')
