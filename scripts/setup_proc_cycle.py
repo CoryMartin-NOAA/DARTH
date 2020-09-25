@@ -32,6 +32,24 @@ def gen_slurm_submit(slurmdict):
         rsh.write('\n')
     return batchfile
 
+def gen_gsi_observer_yaml(gsiconfig):
+    """
+    generate YAML for use by run_gsi_observer.sh
+    """
+    # set up an output dictionary, then use pyYAML to write it out
+    yamlout = {}
+    yamlout['time'] = {
+                       'year': gsiconfig['validtime'].strftime('%Y'),
+                       'month': gsiconfig['validtime'].strftime('%m'),
+                       'day': gsiconfig['validtime'].strftime('%d'),
+                       'cycle': gsiconfig['validtime'].strftime('%H'),
+    }
+    yamlout['background'] = gsiconfig['background']
+    timestr = gsiconfig['validtime'].strftime('%Y%m%d%H')
+    yamlpath = gsiconfig['gsiwork'] + '/run_gsi_observer_%s.yaml' % (timestr)
+    with open(yamlpath, 'w') as file:
+        yaml.dump(yamlout, file)
+    return yamlpath
 
 def main(yamlconfig):
     mydir = os.path.dirname(os.path.realpath(__file__))
@@ -40,8 +58,11 @@ def main(yamlconfig):
     validtime = yamlconfig['analysis cycle']['time']
     if 'gsi observer' in yamlconfig:
         gsiconfig = yamlconfig['gsi observer']
-        gsiobsyaml = gsiconfig['gsiwork']+'/%s_gsi_observer.yaml' % (validtime.strftime('%Y%m%d%H'))
+        gsiconfig['validtime'] = validtime
+        gsiconfig['dump'] = yamlconfig['analysis cycle']['dump']
+        gsiconfig['rstprod'] = yamlconfig['analysis cycle']['restricted data']
         # create YAML for GSI observer script
+        gsiobsyaml = gen_gsi_observer_yaml(gsiconfig)
         # create batch submission script
         if 'slurm' in gsiconfig: # only support slurm currently
             slurmdict = gsiconfig['slurm']
