@@ -1,5 +1,5 @@
 analysis cycle:
-  time: 2020-09-23T18:00:00Z
+  time: 2020-09-25T06:00:00Z
   dump: gdas
   restricted data: true
 
@@ -10,7 +10,7 @@ gsi observer:
     levs: 64
     guessdir: /scratch1/NCEPDEV/rstprod/com/gfs/prod
     format: nemsio
-    gfsv16: true
+    gfsv16: false
   observations:
     bufrdir: /scratch1/NCEPDEV/rstprod/com/gfs/prod
   env:
