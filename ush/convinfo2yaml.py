@@ -79,17 +79,3 @@ config['loop'] = args.loop
 
 main(config)
 
-"""
-  - conventional input:
-        path:
-                - /scratch1/NCEPDEV/stmp2/Cory.R.Martin/ICs_tmp/v16para/gdas.20200531/00/diag_conv_t_ges.2020053100.nc4
-                      observation id:
-                              - 120
-                                    qc flag:
-                                            -
-                                                  data type:
-                                                          - O-F
-                                                                plot type:
-                                                                        - histogram
-                                                                                - spatial
-                                                                                """
