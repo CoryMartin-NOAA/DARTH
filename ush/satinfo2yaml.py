@@ -52,7 +52,7 @@ def main(config):
                    'data type': [diagtype],
                    'plot type': [figs],
                    }
-        yamlout['diagnostic'].append({'satellite input': dictloop})
+        yamlout['diagnostic'].append({'radiance input': dictloop})
 
     # write out the YAML
     with open(config['yaml'], 'w') as file:
