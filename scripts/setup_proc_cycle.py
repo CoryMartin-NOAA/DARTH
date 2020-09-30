@@ -63,6 +63,24 @@ def gen_gsi_observer_yaml(gsiconfig):
         yaml.dump(yamlout, file, default_flow_style=False)
     return yamlpath
 
+def gen_fv3jedi_hofx_yaml(jediconfig):
+    """
+    generate YAML for use by run_fv3jedi_hofx_nomodel.sh
+    """
+    timestr = jediconfig['validtime'].strftime('%Y%m%d%H')
+    yamlpath = jediconfig['hofxwork'] + '/run_fv3jedi_hofx_%s.yaml' % (timestr)
+    # set up an output dictionary, then use pyYAML to write it out
+    yamlout = {}
+    yamlout['hofx'] = {
+                           'workdir': '%s/%s' % (jediconfig['hofxwork'],timestr),
+                           'outputdir': '%s/%s' % (jediconfig['hofxout'],timestr),
+                           'cleanup': jediconfig['cleanup'],
+    }
+    yamlout['env'] = jediconfig['env']
+    with open(yamlpath, 'w') as file:
+        yaml.dump(yamlout, file, default_flow_style=False)
+    return yamlpath
+
 def main(yamlconfig):
     mydir = os.path.dirname(os.path.realpath(__file__))
     rootdir = '/'.join(mydir.split('/')[:-1])
@@ -88,6 +106,20 @@ def main(yamlconfig):
             print('GSI observer sbatch submission file written to: '+gsibatch)
         # TODO add other batch systems (lsf for wcoss)
     # TODO add JEDI things
+    if 'jedi hofx' in yamlconfig:
+        jediconfig = yamlconfig['jedi hofx']
+        jediconfig['validtime'] = validtime
+        # create YAML for JEDI H(x) driver script
+        jedihofxyaml = gen_fv3jedi_hofx_yaml(jediconfig)
+        print('FV3-JEDI H(x) driver configuration YAML file written to: '+jedihofxyaml)
+        if 'slurm' in jediconfig: # only support slurm currently
+            slurmdict = jediconfig['slurm']
+            slurmdict['job'] = 'run_fv3jedi_hofx'
+            slurmdict['jobyaml'] = jedihofxyaml
+            slurmdict['jobscript'] = rootdir + '/scripts/%s.sh' % (slurmdict['job'])
+            slurmdict['validtime'] = validtime
+            hofxbatch = gen_slurm_submit(slurmdict)
+            print('FV3-JEDI H(x) sbatch submission file written to: '+hofxbatch)
     # TODO add plotting / analysis things
 
 parser = argparse.ArgumentParser(description='Generate YAML, other scripts, etc.'+\

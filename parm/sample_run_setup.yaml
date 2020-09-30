@@ -27,4 +27,24 @@ gsi observer:
   gsiwork: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/work
   gsiout: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/output
 
+jedi hofx:
+  background:
+    res: C768
+    levs: 64
+    guessdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gfs/prod
+  observations:
+    iodadir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/ioda/
+  env:
+    launcher: "srun --export=ALL"
+    nthreads: 1
+  slurm:
+    account: da-cpu
+    queue: debug
+    nodes: 1
+    taskspernode: 6
+    maxtime: '00:30:00'
+    submitdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/fv3jedi_hofx_test/work
+  hofxwork: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/fv3jedi_hofx_test/work
+  hofxout: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/fv3jedi_hofx_test/output
+
 cleanup: true
