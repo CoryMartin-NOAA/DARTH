@@ -71,10 +71,24 @@ def gen_fv3jedi_hofx_yaml(jediconfig):
     yamlpath = jediconfig['hofxwork'] + '/run_fv3jedi_hofx_%s.yaml' % (timestr)
     # set up an output dictionary, then use pyYAML to write it out
     yamlout = {}
+    yamlout['time'] = {
+                       'year': jediconfig['validtime'].strftime('%Y'),
+                       'month': jediconfig['validtime'].strftime('%m'),
+                       'day': jediconfig['validtime'].strftime('%d'),
+                       'cycle': jediconfig['validtime'].strftime('%H'),
+    }
+    yamlout['background'] = jediconfig['background']
+    yamlout['observations'] = {
+                               'iodadir': jediconfig['observations']['bufrdir'],
+                               'dump': jediconfig['dump'],
+                               'restricted': jediconfig['rstprod'],
+    }
     yamlout['hofx'] = {
                            'workdir': '%s/%s' % (jediconfig['hofxwork'],timestr),
                            'outputdir': '%s/%s' % (jediconfig['hofxout'],timestr),
                            'cleanup': jediconfig['cleanup'],
+                           'executable': jediconfig['executable'],
+                           'yamlfile': jediconfig['hofxwork'] + '/fv3jedi_hofx_nomodel_%s.yaml' % (timestr),
     }
     yamlout['env'] = jediconfig['env']
     with open(yamlpath, 'w') as file:
@@ -109,6 +123,9 @@ def main(yamlconfig):
     if 'jedi hofx' in yamlconfig:
         jediconfig = yamlconfig['jedi hofx']
         jediconfig['validtime'] = validtime
+        jediconfig['dump'] = yamlconfig['analysis cycle']['dump']
+        jediconfig['rstprod'] = yamlconfig['analysis cycle']['restricted data']
+        jediconfig['cleanup'] = yamlconfig['cleanup']
         # create YAML for JEDI H(x) driver script
         jedihofxyaml = gen_fv3jedi_hofx_yaml(jediconfig)
         print('FV3-JEDI H(x) driver configuration YAML file written to: '+jedihofxyaml)
