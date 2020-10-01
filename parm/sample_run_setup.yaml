@@ -1,5 +1,5 @@
 analysis cycle:
-  time: 2020-09-25T06:00:00Z
+  time: 2020-05-31T00:00:00Z
   dump: gdas
   restricted data: true
 
@@ -30,8 +30,8 @@ gsi observer:
 jedi hofx:
   background:
     res: C768
-    levs: 64
-    guessdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gfs/prod
+    levs: 127
+    guessdir: /scratch1/NCEPDEV/stmp2/Cory.R.Martin/ICs_tmp/v16para/
     gfsv16: false
   observations:
     iodadir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/ioda/

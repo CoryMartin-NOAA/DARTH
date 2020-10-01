@@ -37,6 +37,7 @@ $USHDIR/gen_yaml_fv3jedi_hofx_nomodel.py -y $JEDI_hofx_yamlfile
 ## link observations
 
 ## link model backgrounds
+mkdir -p $JEDI_hofx_workdir/Data/bkg
 $USHDIR/link_fv3_restarts.sh $YAMLFILE
 
 ## run H(x)

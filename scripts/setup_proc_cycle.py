@@ -79,7 +79,7 @@ def gen_fv3jedi_hofx_yaml(jediconfig):
     }
     yamlout['background'] = jediconfig['background']
     yamlout['observations'] = {
-                               'iodadir': jediconfig['observations']['bufrdir'],
+                               'iodadir': jediconfig['observations']['iodadir'],
                                'dump': jediconfig['dump'],
                                'restricted': jediconfig['rstprod'],
     }
@@ -131,7 +131,7 @@ def main(yamlconfig):
         print('FV3-JEDI H(x) driver configuration YAML file written to: '+jedihofxyaml)
         if 'slurm' in jediconfig: # only support slurm currently
             slurmdict = jediconfig['slurm']
-            slurmdict['job'] = 'run_fv3jedi_hofx'
+            slurmdict['job'] = 'run_fv3jedi_hofx_nomodel'
             slurmdict['jobyaml'] = jedihofxyaml
             slurmdict['jobscript'] = rootdir + '/scripts/%s.sh' % (slurmdict['job'])
             slurmdict['validtime'] = validtime

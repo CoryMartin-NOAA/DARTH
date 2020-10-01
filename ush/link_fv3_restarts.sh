@@ -36,7 +36,7 @@ if [[ "$FV3_background_gfsv16" = "true" ]]; then
 fi
 
 # Calculate RESTART directory path
-datges=${FV3_background_guessdir}/${GSI_observations_dump}.${PDYg}/${cycg}/${atmos}/RESTART
+datges=${FV3_background_guessdir}/${FV3_observations_dump}.${PDYg}/${cycg}/${atmos}/RESTART
 
 # RESTART time string
 RSTPREFIX=$PDYa.${cyca}0000
@@ -46,7 +46,7 @@ RSTTILES=".fv_core.res .fv_srf_wnd.res .fv_tracer.res .phy_data .sfc_data"
 # loop through files that are not per each cubed-sphere tile
 for file in $RSTGLOBAL; do
   RSTFILEIN=$datges/$RSTPREFIX$file
-  RSTFILEOUT=$FV3_hofx_workdir/$RSTPREFIX$file
+  RSTFILEOUT=$FV3_hofx_workdir/Data/bkg/$RSTPREFIX$file
   $ncpl $RSTFILEIN $RSTFILEOUT
 done
 
@@ -55,7 +55,7 @@ for ((tile=1;tile<=6;tile++)); do
   TILESUFFIX=tile${tile}.nc
   for file in $RSTTILES; do
     RSTFILEIN=$datges/${RSTPREFIX}${file}.${TILESUFFIX}
-    RSTFILEOUT=$FV3_hofx_workdir/${RSTPREFIX}${file}.${TILESUFFIX}
+    RSTFILEOUT=$FV3_hofx_workdir/Data/bkg/${RSTPREFIX}${file}.${TILESUFFIX}
     $ncpl $RSTFILEIN $RSTFILEOUT
   done
 done
