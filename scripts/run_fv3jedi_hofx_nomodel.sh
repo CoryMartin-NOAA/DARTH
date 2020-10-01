@@ -33,6 +33,9 @@ ln -fs $JEDI_hofx_executable $JEDI_hofx_workdir/fv3jedi_hofx_nomodel.x
 $USHDIR/gen_yaml_fv3jedi_hofx_nomodel.py -y $JEDI_hofx_yamlfile
 
 ## link fix files
+mkdir -p $JEDI_hofx_workdir/Data/fv3files
+mkdir -p $JEDI_hofx_workdir/Data/fieldsets
+$USHDIR/link_fv3jedi_hofx_fix.sh $YAMLFILE
 
 ## link observations
 

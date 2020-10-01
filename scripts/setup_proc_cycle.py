@@ -90,6 +90,7 @@ def gen_fv3jedi_hofx_yaml(jediconfig):
                            'executable': jediconfig['executable'],
                            'yamlfile': jediconfig['hofxwork'] + '/fv3jedi_hofx_nomodel_%s.yaml' % (timestr),
     }
+    yamlout['fix'] = { 'fixfv3jedi' : jediconfig['fixfv3jedi']}
     yamlout['env'] = jediconfig['env']
     with open(yamlpath, 'w') as file:
         yaml.dump(yamlout, file, default_flow_style=False)

@@ -49,5 +49,6 @@ jedi hofx:
   hofxwork: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/fv3jedi_hofx_test/work
   hofxout: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/fv3jedi_hofx_test/output
   executable: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/tropomi_ufo/fv3-bundle/build/bin/fv3jedi_hofx_nomodel.x
+  fixfv3jedi: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/tropomi_ufo/fv3-bundle/fv3-jedi/test/Data
 
 cleanup: true
