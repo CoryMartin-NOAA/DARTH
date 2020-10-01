@@ -38,6 +38,7 @@ mkdir -p $JEDI_hofx_workdir/Data/fieldsets
 $USHDIR/link_fv3jedi_hofx_fix.sh $YAMLFILE
 
 ## link observations
+$USHDIR/link_fv3jedi_hofx_obs.py --hofxyaml $JEDI_hofx_yamlfile --configyaml $YAMLFILE
 
 ## link model backgrounds
 mkdir -p $JEDI_hofx_workdir/Data/bkg
