@@ -1,5 +1,5 @@
 analysis cycle:
-  time: 2020-05-31T00:00:00Z
+  time: 2020-10-05T00:00:00Z
   dump: gdas
   restricted data: true
 
@@ -53,10 +53,13 @@ jedi hofx:
 
 ioda-converters:
   iodaconvbin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/ioda-converters/build/bin/proc_gsi_ncdiag.py
-  modulefile: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/env_jedi_rh
   iodaconvwork: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/iodaconverters_test/work
   gsidiagdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/output
   iodaout: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/ioda/
+  env:
+    launcher: "srun --export=ALL"
+    nthreads: 1
+    modulefile: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/env_jedi_rh
   slurm:
     account: da-cpu
     queue: debug

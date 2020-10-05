@@ -21,7 +21,7 @@ else
 fi
 
 # source modulefile to get proper python on environment
-source $IODA_iodaconv_modulefile
+source $IODA_env_modulefile
 
 # make working directory
 rm -rf $IODA_data_iodaworkdir
