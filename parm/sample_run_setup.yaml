@@ -51,4 +51,18 @@ jedi hofx:
   executable: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/tropomi_ufo/fv3-bundle/build/bin/fv3jedi_hofx_nomodel.x
   fixfv3jedi: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/tropomi_ufo/fv3-bundle/fv3-jedi/test/Data
 
+ioda-converters:
+  iodaconvbin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/ioda-converters/build/bin/proc_gsi_ncdiag.py
+  modulefile: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/env_jedi_rh
+  iodaconvwork: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/iodaconverters_test/work
+  gsidiagdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/output
+  iodaout: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/ioda/
+  slurm:
+    account: da-cpu
+    queue: debug
+    nodes: 1
+    taskspernode: 24
+    maxtime: '00:30:00'
+    submitdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/iodaconverters_test/work
+
 cleanup: true
