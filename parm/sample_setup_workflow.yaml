@@ -1,6 +1,6 @@
 DARTH:
-  sdate: 2020100600
-  edate: 2021100600
+  sdate: 202010060000
+  edate: 202110060000
   cycles: 4
   dump: gdas
   comrot: /scratch2/NCEPDEV/stmp1/Cory.R.Martin
@@ -34,6 +34,7 @@ background:
 # resources
 account: da-cpu
 queue: debug
+queue_arch: service
 prep:
   nodes: 1
   taskspernode: 1
