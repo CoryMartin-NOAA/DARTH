@@ -62,6 +62,7 @@ def create_entities(yamlconfig):
     strings.append('\t<!ENTITY INTERVAL "%02d:00:00">\n' % interval)
     strings.append('\t<!ENTITY TOPYAML "%s">\n' % yamlconfig['mypath'])
     strings.append('\t<!ENTITY COMROT "%s">\n' % yamlconfig['DARTH']['comrot'])
+    strings.append('\t<!ENTITY CDUMP "%s">\n' % yamlconfig['DARTH']['dump'])
     strings.append('\t<!ENTITY HOMEDARTH "%s">\n' % yamlconfig['paths']['rootdir'])
     strings.append('\t<!-- Machine related entities -->\n')
     strings.append('\t<!ENTITY ACCOUNT    "%s">\n' % yamlconfig['account'])
@@ -104,6 +105,80 @@ def get_workflow_header():
     strings.append('\n')
     return ''.join(strings)
 
+def get_tasks_xml(tasks):
+    # create rocoto tasks based on YAML input
+    envars = []
+    if wfu.get_scheduler(wfu.detectMachine()) in ['slurm']:
+        envars.append(rocoto.create_envar(name='SLURM_SET', value='YES'))
+    envars.append(rocoto.create_envar(name='COMROT', value='&COMROT;'))
+    envars.append(rocoto.create_envar(name='HOMEDARTH', value='&HOMEDARTH;'))
+    envars.append(rocoto.create_envar(name='TOPYAML', value='&TOPYAML;'))
+    envars.append(rocoto.create_envar(name='CDUMP', value='&CDUMP;')
+    envars.append(rocoto.create_envar(name='CDATE', value='<cyclestr>@Y@m@d@H</cyclestr>'))
+    envars.append(rocoto.create_envar(name='PDY', value='<cyclestr>@Y@m@d</cyclestr>'))
+    envars.append(rocoto.create_envar(name='cyc', value='<cyclestr>@H</cyclestr>'))
+
+    dict_tasks = OrderedDict()
+    for task in tasks:
+        if task == 'prep':
+            deps = []
+            data = '&COMROT/&CDUMP.@Y@m@d/@H/atmos/gdas.t@Hz.atmf006.nc'
+            dep_dict = {'type': 'data', 'data': data, 'offset': '-&INTERVAL;'}
+            deps.append(rocoto.add_dependency(dep_dict))
+            dependencies = rocoto.create_dependency(dep=deps)
+            task = wfu.create_wf_task('prep', cdump='DARTH', envar=envars, dependency=dependencies)
+            dict_tasks['DARTHprep'] = task
+        elif task == 'gsiobserver':
+            deps = []
+            dep_dict = {'type': 'task', 'name': 'DARTHprep'}
+            deps.append(rocoto.add_dependency(dep_dict))
+            dependencies = rocoto.create_dependency(dep=deps)
+            task = wfu.create_wf_task('gsiobserver', cdump='DARTH', envar=envars, dependency=dependencies)
+            dict_tasks['DARTHgsiobserver'] = task
+        elif task == 'gsiiodaconv':
+            deps = []
+            dep_dict = {'type': 'task', 'name': 'DARTHgsiobserver'}
+            deps.append(rocoto.add_dependency(dep_dict))
+            dependencies = rocoto.create_dependency(dep=deps)
+            task = wfu.create_wf_task('gsiiodaconv', cdump='DARTH', envar=envars, dependency=dependencies)
+            dict_tasks['DARTHgsiiodaconv'] = task
+        elif task == 'jedihofx':
+            if 'gsiiodaconv' in tasks:
+                deps = []
+                dep_dict = {'type': 'task', 'name': 'DARTHgsiiodaconv'}
+                deps.append(rocoto.add_dependency(dep_dict))
+                dependencies = rocoto.create_dependency(dep=deps)
+                task = wfu.create_wf_task('jedihofx', cdump='DARTH', envar=envars, dependency=dependencies)
+                dict_tasks['DARTHjedihofx'] = task
+            else:
+                deps = []
+                dep_dict = {'type': 'task', 'name': 'DARTHgsiobserver'}
+                deps.append(rocoto.add_dependency(dep_dict))
+                dependencies = rocoto.create_dependency(dep=deps)
+                task = wfu.create_wf_task('jedihofx', cdump='DARTH', envar=envars, dependency=dependencies)
+                dict_tasks['DARTHjedihofx'] = task
+        elif task == 'post':
+            deps = []
+            dep_dict = {'type': 'task', 'name': 'DARTHgsiobserver'}
+            deps.append(rocoto.add_dependency(dep_dict))
+            dep_dict = {'type': 'task', 'name': 'DARTHjedihofx'}
+            deps.append(rocoto.add_dependency(dep_dict))
+            dependencies = rocoto.create_dependency(dep_condition='and', dep=deps)
+            task = wfu.create_wf_task('post', cdump='DARTH', envar=envars, dependency=dependencies)
+            dict_tasks['DARTHpost'] = task
+        else:
+            print(task+' is not supported')
+        return dict_tasks
+
+def dict_to_strings(dict_in):
+
+    strings = []
+    for key in dict_in.keys():
+        strings.append(dict_in[key])
+        strings.append('\n')
+
+    return ''.join(strings)
+
 def create_workflow(yamlpath, xmlpath):
     # read in YAML file for configuration
     with open(yamlpath, 'r') as stream:
@@ -129,6 +204,7 @@ def create_workflow(yamlpath, xmlpath):
     xmlfile.append(create_entities(yamlconfig))
     xmlfile.append(xmlresources)
     xmlfile.append(get_workflow_header())
+    xmlfile.append(dict_to_strings(get_tasks_xml(tasks)))
     xmlfile.append(workflow_footer)
 
 
