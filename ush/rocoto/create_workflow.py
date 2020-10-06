@@ -52,13 +52,14 @@ def get_workflow_footer():
 def create_entities(yamlconfig):
     machine = wfu.detectMachine()
     scheduler = wfu.get_scheduler(machine)
+    interval = 24/int(yamlconfig['DARTH']['cycles'])
     strings = []
     strings.append('\n')
     strings.append('\t<!-- Experiment parameters such as name, starting, ending dates -->\n')
     strings.append('\t<!ENTITY PSLOT "DARTH">\n')
     strings.append('\t<!ENTITY SDATE "%s">\n' % yamlconfig['DARTH']['sdate'])
     strings.append('\t<!ENTITY EDATE "%s">\n' % yamlconfig['DARTH']['edate'])
-    strings.append('\t<!ENTITY INTERVAL "%02d:00:00">\n' % 24/(yamlconfig['DARTH']['cycles']))
+    strings.append('\t<!ENTITY INTERVAL "%02d:00:00">\n' % interval)
     strings.append('\t<!ENTITY TOPYAML "%s">\n' % yamlconfig['mypath'])
     strings.append('\t<!ENTITY COMROT "%s">\n' % yamlconfig['DARTH']['comrot'])
     strings.append('\t<!ENTITY HOMEDARTH "%s">\n' % yamlconfig['paths']['rootdir'])
@@ -80,13 +81,27 @@ def get_resource_xml(task, resourcedict):
     nodes = resourcedict['nodes']
     ppn = resourcedict['taskspernode']
     tpp = 1
-    resstr = f'<nodes>{nodes}:ppn={ppn}:tpp={tpp}</nodes>''>
+    resstr = f'<nodes>{nodes}:ppn={ppn}:tpp={tpp}</nodes>'
     natstr = "--export=NONE"
     strings = []
     strings.append('\t<!ENTITY QUEUE_%s     "%s">\n' % (task, '&QUEUE;'))
     strings.append('\t<!ENTITY WALLTIME_%s  "%s">\n' % (task, wtimestr))
     strings.append('\t<!ENTITY RESOURCES_%s "%s">\n' % (task, resstr))
     strings.append('\t<!ENTITY NATIVE_%s    "%s">\n' % (task, natstr))
+    return ''.join(strings)
+
+def get_workflow_header():
+    strings = []
+    strings.append('\n')
+    strings.append(']>\n')
+    strings.append('\n')
+    strings.append('<workflow realtime="F" scheduler="&SCHEDULER;" cyclethrottle="&CYCLETHROTTLE;" taskthrottle="&TASKTHROTTLE;">\n')
+    strings.append('\n')
+    strings.append('\t<log verbosity="10"><cyclestr>&COMROT;/logs/@Y@m@d@H.log</cyclestr></log>\n')
+    strings.append('\n')
+    strings.append('\t<!-- Define the cycles -->\n')
+    strings.append('\t<cycledef group="DARTH"  >&SDATE; &EDATE; &INTERVAL;</cycledef>\n')
+    strings.append('\n')
     return ''.join(strings)
 
 def create_workflow(yamlpath, xmlpath):
@@ -113,6 +128,7 @@ def create_workflow(yamlpath, xmlpath):
     xmlfile.append(preamble)
     xmlfile.append(create_entities(yamlconfig))
     xmlfile.append(xmlresources)
+    xmlfile.append(get_workflow_header())
     xmlfile.append(workflow_footer)
 
 

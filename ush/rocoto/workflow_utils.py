@@ -16,6 +16,7 @@ import rocoto
 
 DATE_ENV_VARS=['CDATE','SDATE','EDATE']
 SCHEDULER_MAP={'HERA':'slurm',
+               'ORION':'slurm',
                'WCOSS':'lsf',
                'WCOSS_DELL_P3':'lsf',
                'WCOSS_C':'lsfcray'}
@@ -83,6 +84,43 @@ def find_config(config_name, configs):
     raise UnknownConfigError("%s does not exist (known: %s), ABORT!" % (
         config_name,repr(config_name)))
 
+def source_configs(configs, tasks):
+    '''
+        Given list of config files, source them
+        and return a dictionary for each task
+        Every task depends on config.base
+    '''
+
+    dict_configs = {}
+
+    # Return config.base as well
+    dict_configs['base'] = config_parser([find_config('config.base', configs)])
+
+    # Source the list of input tasks
+    for task in tasks:
+
+        files = []
+
+        files.append(find_config('config.base', configs))
+
+        if task in ['eobs', 'eomg']:
+            files.append(find_config('config.anal', configs))
+            files.append(find_config('config.eobs', configs))
+        elif task in ['eupd']:
+            files.append(find_config('config.anal', configs))
+            files.append(find_config('config.eupd', configs))
+        elif task in ['efcs']:
+            files.append(find_config('config.fcst', configs))
+            files.append(find_config('config.efcs', configs))
+        else:
+            files.append(find_config('config.%s' % task, configs))
+
+        print('sourcing config.%s' % task)
+        dict_configs[task] = config_parser(files)
+
+    return dict_configs
+
+
 def config_parser(files):
     """
     Given the name of config file, key-value pair of all variables in the config file is returned as a dictionary
@@ -107,10 +145,12 @@ def config_parser(files):
 
 def detectMachine():
 
-    machines = ['HERA', 'WCOSS_C', 'WCOSS_DELL_P3']
+    machines = ['HERA', 'ORION' 'WCOSS_C', 'WCOSS_DELL_P3']
 
     if os.path.exists('/scratch1/NCEPDEV'):
         return 'HERA'
+    elif os.path.exists('/work/noaa'):
+        return 'ORION'
     elif os.path.exists('/gpfs') and os.path.exists('/etc/SuSE-release'):
         return 'WCOSS_C'
     elif os.path.exists('/gpfs/dell2'):
@@ -158,7 +198,11 @@ def create_wf_task(task, cdump='gdas', cycledef=None, envar=None, dependency=Non
                  'dependency': dependency, \
                  'final': final}
 
-    if task in ['getic','arch','earc'] and get_scheduler(detectMachine()) in ['slurm']:
+    # Add PARTITION_BATCH to all non-service jobs on Orion (SLURM)
+    if get_scheduler(detectMachine()) in ['slurm'] and detectMachine() in ['ORION']:
+        task_dict['partition'] = '&PARTITION_BATCH;'
+    # Add PARTITION_SERVICE to all service jobs (SLURM)
+    if get_scheduler(detectMachine()) in ['slurm'] and task in ['getic','arch','earc']:
         task_dict['partition'] = '&PARTITION_%s_%s;' % (task.upper(),cdump.upper())
 
     if metatask is None:
@@ -193,17 +237,17 @@ def create_firstcyc_task(cdump='gdas'):
                  'command': 'sleep 1', \
                  'jobname': '&PSLOT;_%s_@H' % taskstr, \
                  'account': '&ACCOUNT;', \
-                 'queue': '&QUEUE_ARCH;', \
+                 'queue': '&QUEUE_SERVICE;', \
                  'walltime': '&WALLTIME_ARCH_%s;' % cdump.upper(), \
                  'native': '&NATIVE_ARCH_%s;' % cdump.upper(), \
                  'resources': '&RESOURCES_ARCH_%s;' % cdump.upper(), \
                  'log': '&ROTDIR;/logs/@Y@m@d@H/%s.log' % taskstr, \
-                 'queue': '&QUEUE_ARCH_%s;' % cdump.upper(), \
+                 'queue': '&QUEUE_SERVICE_%s;' % cdump.upper(), \
                  'dependency': dependencies}
 
     if get_scheduler(detectMachine()) in ['slurm']:
         task_dict['queue'] = '&QUEUE;'
-        task_dict['partition'] = '&PARTITION_ARCH;'
+        task_dict['partition'] = '&PARTITION_SERVICE;'
 
     task = rocoto.create_task(task_dict)
 
@@ -251,7 +295,7 @@ def get_resources(machine, cfg, task, reservation, cdump='gdas'):
     else:
         ppn = cfg['npe_node_%s' % ltask]
 
-    if machine in [ 'WCOSS_DELL_P3', 'HERA']:
+    if machine in [ 'WCOSS_DELL_P3', 'HERA', 'ORION']:
         threads = cfg['nth_%s' % ltask]
 
     nodes = np.int(np.ceil(np.float(tasks) / np.float(ppn)))
@@ -262,9 +306,9 @@ def get_resources(machine, cfg, task, reservation, cdump='gdas'):
     if scheduler in ['slurm']:
         natstr = '--export=NONE'
 
-    if machine in ['HERA', 'WCOSS_C', 'WCOSS_DELL_P3']:
+    if machine in ['HERA', 'ORION', 'WCOSS_C', 'WCOSS_DELL_P3']:
 
-        if machine in ['HERA']:
+        if machine in ['HERA', 'ORION']:
             resstr = '<nodes>%d:ppn=%d:tpp=%d</nodes>' % (nodes, ppn, threads)
         else:
             resstr = '<nodes>%d:ppn=%d</nodes>' % (nodes, ppn)
@@ -286,7 +330,7 @@ def get_resources(machine, cfg, task, reservation, cdump='gdas'):
         resstr = '<cores>%d</cores>' % tasks
 
     if task in ['arch', 'earc', 'getic']:
-        queuestr = '&QUEUE;' if scheduler in ['slurm'] else '&QUEUE_ARCH;'
+        queuestr = '&QUEUE;' if scheduler in ['slurm'] else '&QUEUE_SERVICE;'
     else:
         queuestr = '&QUEUE;'
 
