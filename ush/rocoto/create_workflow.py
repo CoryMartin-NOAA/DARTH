@@ -7,6 +7,8 @@ import rocoto
 import argparse
 import sys
 import workflow_utils as wfu
+from collections import OrderedDict
+import re
 
 def main():
     parser = argparse.ArgumentParser(description='create rocoto workflow for DARTH')
@@ -61,12 +63,15 @@ def create_entities(yamlconfig):
     strings.append('\t<!ENTITY EDATE "%s">\n' % yamlconfig['DARTH']['edate'])
     strings.append('\t<!ENTITY INTERVAL "%02d:00:00">\n' % interval)
     strings.append('\t<!ENTITY TOPYAML "%s">\n' % yamlconfig['mypath'])
-    strings.append('\t<!ENTITY COMROT "%s">\n' % yamlconfig['DARTH']['comrot'])
+    strings.append('\t<!ENTITY ROTDIR "%s">\n' % yamlconfig['DARTH']['comrot'])
     strings.append('\t<!ENTITY CDUMP "%s">\n' % yamlconfig['DARTH']['dump'])
     strings.append('\t<!ENTITY HOMEDARTH "%s">\n' % yamlconfig['paths']['rootdir'])
+    strings.append('\t<!ENTITY JOBS_DIR "%s">\n' % (yamlconfig['paths']['rootdir']+'/jobs/rocoto'))
     strings.append('\t<!-- Machine related entities -->\n')
     strings.append('\t<!ENTITY ACCOUNT    "%s">\n' % yamlconfig['account'])
     strings.append('\t<!ENTITY QUEUE      "%s">\n' % yamlconfig['queue'])
+    if scheduler in ['slurm'] and machine in ['ORION']:
+        strings.append('\t<!ENTITY PARTITION_BATCH "%s">\n' % yamlconfig['partition'])
     strings.append('\t<!ENTITY SCHEDULER  "%s">\n' % scheduler)
     strings.append('\t<!ENTITY ROOTWORK "%s">\n' % yamlconfig['paths']['rootdir'])
     strings.append('\n')
@@ -85,10 +90,11 @@ def get_resource_xml(task, resourcedict):
     resstr = f'<nodes>{nodes}:ppn={ppn}:tpp={tpp}</nodes>'
     natstr = "--export=NONE"
     strings = []
-    strings.append('\t<!ENTITY QUEUE_%s     "%s">\n' % (task, '&QUEUE;'))
-    strings.append('\t<!ENTITY WALLTIME_%s  "%s">\n' % (task, wtimestr))
-    strings.append('\t<!ENTITY RESOURCES_%s "%s">\n' % (task, resstr))
-    strings.append('\t<!ENTITY NATIVE_%s    "%s">\n' % (task, natstr))
+    TASK = task.upper()
+    strings.append('\t<!ENTITY QUEUE_%s_DARTH     "%s">\n' % (TASK, '&QUEUE;'))
+    strings.append('\t<!ENTITY WALLTIME_%s_DARTH  "%s">\n' % (TASK, wtimestr))
+    strings.append('\t<!ENTITY RESOURCES_%s_DARTH "%s">\n' % (TASK, resstr))
+    strings.append('\t<!ENTITY NATIVE_%s_DARTH    "%s">\n' % (TASK, natstr))
     return ''.join(strings)
 
 def get_workflow_header():
@@ -98,7 +104,7 @@ def get_workflow_header():
     strings.append('\n')
     strings.append('<workflow realtime="F" scheduler="&SCHEDULER;" cyclethrottle="&CYCLETHROTTLE;" taskthrottle="&TASKTHROTTLE;">\n')
     strings.append('\n')
-    strings.append('\t<log verbosity="10"><cyclestr>&COMROT;/logs/@Y@m@d@H.log</cyclestr></log>\n')
+    strings.append('\t<log verbosity="10"><cyclestr>&ROTDIR;/logs/@Y@m@d@H.log</cyclestr></log>\n')
     strings.append('\n')
     strings.append('\t<!-- Define the cycles -->\n')
     strings.append('\t<cycledef group="DARTH"  >&SDATE; &EDATE; &INTERVAL;</cycledef>\n')
@@ -110,39 +116,39 @@ def get_tasks_xml(tasks):
     envars = []
     if wfu.get_scheduler(wfu.detectMachine()) in ['slurm']:
         envars.append(rocoto.create_envar(name='SLURM_SET', value='YES'))
-    envars.append(rocoto.create_envar(name='COMROT', value='&COMROT;'))
+    envars.append(rocoto.create_envar(name='ROTDIR', value='&ROTDIR;'))
     envars.append(rocoto.create_envar(name='HOMEDARTH', value='&HOMEDARTH;'))
     envars.append(rocoto.create_envar(name='TOPYAML', value='&TOPYAML;'))
-    envars.append(rocoto.create_envar(name='CDUMP', value='&CDUMP;')
+    envars.append(rocoto.create_envar(name='CDUMP', value='&CDUMP;'))
     envars.append(rocoto.create_envar(name='CDATE', value='<cyclestr>@Y@m@d@H</cyclestr>'))
     envars.append(rocoto.create_envar(name='PDY', value='<cyclestr>@Y@m@d</cyclestr>'))
     envars.append(rocoto.create_envar(name='cyc', value='<cyclestr>@H</cyclestr>'))
 
     dict_tasks = OrderedDict()
-    for task in tasks:
-        if task == 'prep':
+    for itask in tasks:
+        if itask == 'prep':
             deps = []
-            data = '&COMROT/&CDUMP.@Y@m@d/@H/atmos/gdas.t@Hz.atmf006.nc'
+            data = '&ROTDIR;/&CDUMP;.@Y@m@d/@H/atmos/gdas.t@Hz.atmf006.nc'
             dep_dict = {'type': 'data', 'data': data, 'offset': '-&INTERVAL;'}
             deps.append(rocoto.add_dependency(dep_dict))
             dependencies = rocoto.create_dependency(dep=deps)
             task = wfu.create_wf_task('prep', cdump='DARTH', envar=envars, dependency=dependencies)
             dict_tasks['DARTHprep'] = task
-        elif task == 'gsiobserver':
+        elif itask == 'gsiobserver':
             deps = []
             dep_dict = {'type': 'task', 'name': 'DARTHprep'}
             deps.append(rocoto.add_dependency(dep_dict))
             dependencies = rocoto.create_dependency(dep=deps)
             task = wfu.create_wf_task('gsiobserver', cdump='DARTH', envar=envars, dependency=dependencies)
             dict_tasks['DARTHgsiobserver'] = task
-        elif task == 'gsiiodaconv':
+        elif itask == 'gsiiodaconv':
             deps = []
             dep_dict = {'type': 'task', 'name': 'DARTHgsiobserver'}
             deps.append(rocoto.add_dependency(dep_dict))
             dependencies = rocoto.create_dependency(dep=deps)
             task = wfu.create_wf_task('gsiiodaconv', cdump='DARTH', envar=envars, dependency=dependencies)
             dict_tasks['DARTHgsiiodaconv'] = task
-        elif task == 'jedihofx':
+        elif itask == 'jedihofx':
             if 'gsiiodaconv' in tasks:
                 deps = []
                 dep_dict = {'type': 'task', 'name': 'DARTHgsiiodaconv'}
@@ -157,7 +163,7 @@ def get_tasks_xml(tasks):
                 dependencies = rocoto.create_dependency(dep=deps)
                 task = wfu.create_wf_task('jedihofx', cdump='DARTH', envar=envars, dependency=dependencies)
                 dict_tasks['DARTHjedihofx'] = task
-        elif task == 'post':
+        elif itask == 'post':
             deps = []
             dep_dict = {'type': 'task', 'name': 'DARTHgsiobserver'}
             deps.append(rocoto.add_dependency(dep_dict))
@@ -167,8 +173,8 @@ def get_tasks_xml(tasks):
             task = wfu.create_wf_task('post', cdump='DARTH', envar=envars, dependency=dependencies)
             dict_tasks['DARTHpost'] = task
         else:
-            print(task+' is not supported')
-        return dict_tasks
+            print(itask+' is not supported')
+    return dict_tasks
 
 def dict_to_strings(dict_in):
 
@@ -187,6 +193,15 @@ def create_workflow(yamlpath, xmlpath):
     darthconfig = yamlconfig['DARTH']
     # get list of tasks
     tasks = darthconfig['steps']
+    task_dict = get_tasks_xml(tasks)
+    # remove MEMORY
+    for each_task in task_dict:
+        temp_task_string = []
+        for each_line in re.split(r'(\s+)', task_dict[each_task]):
+            if 'memory' not in each_line:
+                temp_task_string.append(each_line)
+        task_dict[each_task] = ''.join(temp_task_string)
+
     # loop through tasks
     taskresources = {}
     xmlresources = []
@@ -204,7 +219,7 @@ def create_workflow(yamlpath, xmlpath):
     xmlfile.append(create_entities(yamlconfig))
     xmlfile.append(xmlresources)
     xmlfile.append(get_workflow_header())
-    xmlfile.append(dict_to_strings(get_tasks_xml(tasks)))
+    xmlfile.append(dict_to_strings(task_dict))
     xmlfile.append(workflow_footer)
 
 

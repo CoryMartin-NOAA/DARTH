@@ -35,6 +35,7 @@ background:
 account: da-cpu
 queue: debug
 queue_arch: service
+partition: orion
 prep:
   nodes: 1
   taskspernode: 1
