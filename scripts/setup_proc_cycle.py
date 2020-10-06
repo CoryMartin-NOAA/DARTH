@@ -23,6 +23,7 @@ def gen_slurm_submit(slurmdict):
               '--ntasks-per-node': slurmdict['taskspernode'],
               '-t': slurmdict['maxtime'],
     }
+    # TODO check if output directory exists, make it if not
     with open (batchfile, 'w') as rsh:
         rsh.write('#!/bin/bash\n')
         for key, value in sbatch.items():
@@ -59,6 +60,66 @@ def gen_gsi_observer_yaml(gsiconfig):
                            'cleanup': gsiconfig['cleanup'],
     }
     yamlout['env'] = gsiconfig['env']
+    # TODO check if output directory exists, make it if not
+    with open(yamlpath, 'w') as file:
+        yaml.dump(yamlout, file, default_flow_style=False)
+    return yamlpath
+
+def gen_fv3jedi_hofx_yaml(jediconfig):
+    """
+    generate YAML for use by run_fv3jedi_hofx_nomodel.sh
+    """
+    timestr = jediconfig['validtime'].strftime('%Y%m%d%H')
+    yamlpath = jediconfig['hofxwork'] + '/run_fv3jedi_hofx_%s.yaml' % (timestr)
+    # set up an output dictionary, then use pyYAML to write it out
+    yamlout = {}
+    yamlout['time'] = {
+                       'year': jediconfig['validtime'].strftime('%Y'),
+                       'month': jediconfig['validtime'].strftime('%m'),
+                       'day': jediconfig['validtime'].strftime('%d'),
+                       'cycle': jediconfig['validtime'].strftime('%H'),
+    }
+    yamlout['background'] = jediconfig['background']
+    yamlout['observations'] = {
+                               'iodadir': jediconfig['observations']['iodadir'],
+                               'dump': jediconfig['dump'],
+                               'restricted': jediconfig['rstprod'],
+    }
+    yamlout['hofx'] = {
+                           'workdir': '%s/%s' % (jediconfig['hofxwork'],timestr),
+                           'outputdir': '%s/%s' % (jediconfig['hofxout'],timestr),
+                           'cleanup': jediconfig['cleanup'],
+                           'executable': jediconfig['executable'],
+                           'yamlfile': jediconfig['hofxwork'] + '/fv3jedi_hofx_nomodel_%s.yaml' % (timestr),
+    }
+    yamlout['fix'] = { 'fixfv3jedi' : jediconfig['fixfv3jedi']}
+    yamlout['env'] = jediconfig['env']
+    # TODO check if output directory exists, make it if not
+    with open(yamlpath, 'w') as file:
+        yaml.dump(yamlout, file, default_flow_style=False)
+    return yamlpath
+
+def gen_gsinc_iodaconv_yaml(iodaconvconfig):
+    timestr = iodaconvconfig['validtime'].strftime('%Y%m%d%H')
+    yamlpath = iodaconvconfig['iodaconvwork'] + '/run_gsinc_iodaconv_%s.yaml' % (timestr)
+    # set up an output dictionary, then use pyYAML to write it out
+    yamlout = {}
+    yamlout['time'] = {
+                       'year': iodaconvconfig['validtime'].strftime('%Y'),
+                       'month': iodaconvconfig['validtime'].strftime('%m'),
+                       'day': iodaconvconfig['validtime'].strftime('%d'),
+                       'cycle': iodaconvconfig['validtime'].strftime('%H'),
+    }
+    yamlout['data'] = {
+                       'gsiindir': '%s/%s' % (iodaconvconfig['gsidiagdir'],timestr),
+                       'iodaoutdir': '%s/%s' % (iodaconvconfig['iodaout'],timestr),
+                       'iodaworkdir': '%s/%s' % (iodaconvconfig['iodaconvwork'],timestr),
+    }
+    yamlout['iodaconv'] = {
+                       'iodaconvbin': iodaconvconfig['iodaconvbin'],
+    }
+    yamlout['env'] = iodaconvconfig['env']
+    # TODO check if output directory exists, make it if not
     with open(yamlpath, 'w') as file:
         yaml.dump(yamlout, file, default_flow_style=False)
     return yamlpath
@@ -87,7 +148,37 @@ def main(yamlconfig):
             gsibatch = gen_slurm_submit(slurmdict)
             print('GSI observer sbatch submission file written to: '+gsibatch)
         # TODO add other batch systems (lsf for wcoss)
-    # TODO add JEDI things
+    if 'ioda-converters' in yamlconfig:
+        iodaconvconfig = yamlconfig['ioda-converters']
+        iodaconvconfig['validtime'] = validtime
+        iodaconvconfig['cleanup'] = yamlconfig['cleanup']
+        iodaconvyaml = gen_gsinc_iodaconv_yaml(iodaconvconfig)
+        print('ioda-converter GSI ncdiag YAML written to: '+iodaconvyaml)
+        if 'slurm' in iodaconvconfig: # only support slurm currently
+            slurmdict = iodaconvconfig['slurm']
+            slurmdict['job'] = 'run_gsincdiag_iodaconv'
+            slurmdict['jobyaml'] = iodaconvyaml
+            slurmdict['jobscript'] = rootdir + '/scripts/%s.sh' % (slurmdict['job'])
+            slurmdict['validtime'] = validtime
+            iodaconvbatch = gen_slurm_submit(slurmdict)
+            print('GSI ncdiag ioda-converters sbatch submission file written to: '+iodaconvbatch)
+    if 'jedi hofx' in yamlconfig:
+        jediconfig = yamlconfig['jedi hofx']
+        jediconfig['validtime'] = validtime
+        jediconfig['dump'] = yamlconfig['analysis cycle']['dump']
+        jediconfig['rstprod'] = yamlconfig['analysis cycle']['restricted data']
+        jediconfig['cleanup'] = yamlconfig['cleanup']
+        # create YAML for JEDI H(x) driver script
+        jedihofxyaml = gen_fv3jedi_hofx_yaml(jediconfig)
+        print('FV3-JEDI H(x) driver configuration YAML file written to: '+jedihofxyaml)
+        if 'slurm' in jediconfig: # only support slurm currently
+            slurmdict = jediconfig['slurm']
+            slurmdict['job'] = 'run_fv3jedi_hofx_nomodel'
+            slurmdict['jobyaml'] = jedihofxyaml
+            slurmdict['jobscript'] = rootdir + '/scripts/%s.sh' % (slurmdict['job'])
+            slurmdict['validtime'] = validtime
+            hofxbatch = gen_slurm_submit(slurmdict)
+            print('FV3-JEDI H(x) sbatch submission file written to: '+hofxbatch)
     # TODO add plotting / analysis things
 
 parser = argparse.ArgumentParser(description='Generate YAML, other scripts, etc.'+\
