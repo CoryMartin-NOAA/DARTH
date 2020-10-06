@@ -58,9 +58,12 @@ def create_entities(yamlconfig):
     strings.append('\t<!ENTITY PSLOT "DARTH">\n')
     strings.append('\t<!ENTITY SDATE "%s">\n' % yamlconfig['DARTH']['sdate'])
     strings.append('\t<!ENTITY EDATE "%s">\n' % yamlconfig['DARTH']['edate'])
+    strings.append('\t<!ENTITY INTERVAL "%02d:00:00">\n' % 24/(yamlconfig['DARTH']['cycles']))
+    strings.append('\t<!ENTITY TOPYAML "%s">\n' % yamlconfig['mypath'])
+    strings.append('\t<!ENTITY COMROT "%s">\n' % yamlconfig['DARTH']['comrot'])
+    strings.append('\t<!ENTITY HOMEDARTH "%s">\n' % yamlconfig['paths']['rootdir'])
     strings.append('\t<!-- Machine related entities -->\n')
     strings.append('\t<!ENTITY ACCOUNT    "%s">\n' % yamlconfig['account'])
-
     strings.append('\t<!ENTITY QUEUE      "%s">\n' % yamlconfig['queue'])
     strings.append('\t<!ENTITY SCHEDULER  "%s">\n' % scheduler)
     strings.append('\t<!ENTITY ROOTWORK "%s">\n' % yamlconfig['paths']['rootdir'])
@@ -72,25 +75,46 @@ def create_entities(yamlconfig):
     strings.append('\n')
     return ''.join(strings)
 
+def get_resource_xml(task, resourcedict):
+    wtimestr = resourcedict['maxtime']
+    nodes = resourcedict['nodes']
+    ppn = resourcedict['taskspernode']
+    tpp = 1
+    resstr = f'<nodes>{nodes}:ppn={ppn}:tpp={tpp}</nodes>''>
+    natstr = "--export=NONE"
+    strings = []
+    strings.append('\t<!ENTITY QUEUE_%s     "%s">\n' % (task, '&QUEUE;'))
+    strings.append('\t<!ENTITY WALLTIME_%s  "%s">\n' % (task, wtimestr))
+    strings.append('\t<!ENTITY RESOURCES_%s "%s">\n' % (task, resstr))
+    strings.append('\t<!ENTITY NATIVE_%s    "%s">\n' % (task, natstr))
+    return ''.join(strings)
+
 def create_workflow(yamlpath, xmlpath):
     # read in YAML file for configuration
     with open(yamlpath, 'r') as stream:
         yamlconfig = yaml.safe_load(stream)
+    yamlconfig['mypath'] = yamlpath
     darthconfig = yamlconfig['DARTH']
     # get list of tasks
     tasks = darthconfig['steps']
     # loop through tasks
+    taskresources = {}
+    xmlresources = []
     for task in tasks:
-        taskresources = yamlconfig[task]
-
+        taskresources[task] = yamlconfig[task]
+        xmlresources.append(get_resource_xml(task, taskresources[task]))
+    xmlresources = ''.join(xmlresources)
 
     # setup the XML
     preamble = get_preamble()
     workflow_footer = get_workflow_footer()
+
     xmlfile = []
     xmlfile.append(preamble)
     xmlfile.append(create_entities(yamlconfig))
+    xmlfile.append(xmlresources)
     xmlfile.append(workflow_footer)
+
 
     # Write the XML file
     fh = open(xmlpath, 'w')
