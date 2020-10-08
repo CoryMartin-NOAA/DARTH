@@ -22,6 +22,7 @@ paths:
   jedibin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/tropomi_ufo/fv3-bundle/build/bin
   iodaconvbin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/ioda-converters/build/bin
   jedimodule: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/env_jedi_rh
+  guessdir: /scratch1/NCEPDEV/stmp2/Cory.R.Martin/GFSv16para
 
 # model
 background:
@@ -29,7 +30,6 @@ background:
   format: netcdf
   levs: 127
   res: C768
-  guessdir: /scratch1/NCEPDEV/stmp2/Cory.R.Martin/GFSv16para
 
 # resources
 account: da-cpu
