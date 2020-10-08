@@ -1,0 +1,58 @@
+DARTH:
+  sdate: 202010060000
+  edate: 202110060000
+  cycles: 4
+  dump: gdas
+  comrot: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/DARTH
+  steps:
+    - prep
+    - gsiobserver
+    - gsiiodaconv
+    - jedihofx
+    - post
+  cleanup: true
+  rstprod: true
+
+# paths
+paths:
+  rootdir: /scratch1/NCEPDEV/da/Cory.R.Martin/GitHub/DARTH/ 
+  obsdir: /scratch1/NCEPDEV/rstprod/com/gfs/prod # global dump
+  gsiroot: /scratch1/NCEPDEV/da/Cory.R.Martin/Workflows/GFSv16/sorc/gsi.fd
+  jediroot: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/tropomi_ufo/fv3-bundle
+  jedibin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/tropomi_ufo/fv3-bundle/build/bin
+  iodaconvbin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/ioda-converters/build/bin
+  jedimodule: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/env_jedi_rh
+  guessdir: /scratch1/NCEPDEV/stmp2/Cory.R.Martin/GFSv16para
+
+# model
+background:
+  gfsv16: true
+  format: netcdf
+  levs: 127
+  res: C768
+
+# resources
+account: da-cpu
+queue: debug
+queue_arch: service
+partition: orion
+prep:
+  nodes: 1
+  taskspernode: 1
+  maxtime: 00:05:00
+gsiobserver:
+  nodes: 30
+  taskspernode: 8
+  maxtime: 00:30:00
+gsiiodaconv:
+  nodes: 1
+  taskspernode: 24
+  maxtime: 00:30:00
+jedihofx:
+  nodes: 1
+  taskspernode: 6
+  maxtime: 00:30:00
+post:
+  nodes: 1
+  taskspernode: 24
+  maxtime: 00:30:00

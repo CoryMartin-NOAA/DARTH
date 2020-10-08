@@ -38,7 +38,7 @@ def gen_gsi_observer_yaml(gsiconfig):
     generate YAML for use by run_gsi_observer.sh
     """
     timestr = gsiconfig['validtime'].strftime('%Y%m%d%H')
-    yamlpath = gsiconfig['gsiwork'] + '/run_gsi_observer_%s.yaml' % (timestr)
+    yamlpath = gsiconfig['yamldir'] + '/run_gsi_observer_%s.yaml' % (timestr)
     # set up an output dictionary, then use pyYAML to write it out
     yamlout = {}
     yamlout['time'] = {
@@ -54,9 +54,9 @@ def gen_gsi_observer_yaml(gsiconfig):
                                'restricted': gsiconfig['rstprod'],
     }
     yamlout['observer'] = {
-                           'workdir': '%s/%s' % (gsiconfig['gsiwork'],timestr),
+                           'workdir': '%s' % (gsiconfig['gsiwork']),
                            'gsidir': gsiconfig['gsidir'],
-                           'outputdir': '%s/%s' % (gsiconfig['gsiout'],timestr),
+                           'outputdir': '%s' % (gsiconfig['gsiout']),
                            'cleanup': gsiconfig['cleanup'],
     }
     yamlout['env'] = gsiconfig['env']
@@ -70,7 +70,7 @@ def gen_fv3jedi_hofx_yaml(jediconfig):
     generate YAML for use by run_fv3jedi_hofx_nomodel.sh
     """
     timestr = jediconfig['validtime'].strftime('%Y%m%d%H')
-    yamlpath = jediconfig['hofxwork'] + '/run_fv3jedi_hofx_%s.yaml' % (timestr)
+    yamlpath = jediconfig['yamldir'] + '/run_fv3jedi_hofx_%s.yaml' % (timestr)
     # set up an output dictionary, then use pyYAML to write it out
     yamlout = {}
     yamlout['time'] = {
@@ -86,8 +86,8 @@ def gen_fv3jedi_hofx_yaml(jediconfig):
                                'restricted': jediconfig['rstprod'],
     }
     yamlout['hofx'] = {
-                           'workdir': '%s/%s' % (jediconfig['hofxwork'],timestr),
-                           'outputdir': '%s/%s' % (jediconfig['hofxout'],timestr),
+                           'workdir': '%s' % (jediconfig['hofxwork']),
+                           'outputdir': '%s' % (jediconfig['hofxout']),
                            'cleanup': jediconfig['cleanup'],
                            'executable': jediconfig['executable'],
                            'yamlfile': jediconfig['hofxwork'] + '/fv3jedi_hofx_nomodel_%s.yaml' % (timestr),
@@ -101,7 +101,7 @@ def gen_fv3jedi_hofx_yaml(jediconfig):
 
 def gen_gsinc_iodaconv_yaml(iodaconvconfig):
     timestr = iodaconvconfig['validtime'].strftime('%Y%m%d%H')
-    yamlpath = iodaconvconfig['iodaconvwork'] + '/run_gsinc_iodaconv_%s.yaml' % (timestr)
+    yamlpath = iodaconvconfig['yamldir'] + '/run_gsinc_iodaconv_%s.yaml' % (timestr)
     # set up an output dictionary, then use pyYAML to write it out
     yamlout = {}
     yamlout['time'] = {
@@ -111,9 +111,9 @@ def gen_gsinc_iodaconv_yaml(iodaconvconfig):
                        'cycle': iodaconvconfig['validtime'].strftime('%H'),
     }
     yamlout['data'] = {
-                       'gsiindir': '%s/%s' % (iodaconvconfig['gsidiagdir'],timestr),
-                       'iodaoutdir': '%s/%s' % (iodaconvconfig['iodaout'],timestr),
-                       'iodaworkdir': '%s/%s' % (iodaconvconfig['iodaconvwork'],timestr),
+                       'gsiindir': '%s' % (iodaconvconfig['gsidiagdir']),
+                       'iodaoutdir': '%s' % (iodaconvconfig['iodaout']),
+                       'iodaworkdir': '%s' % (iodaconvconfig['iodaconvwork']),
     }
     yamlout['iodaconv'] = {
                        'iodaconvbin': iodaconvconfig['iodaconvbin'],
@@ -129,12 +129,14 @@ def main(yamlconfig):
     rootdir = '/'.join(mydir.split('/')[:-1])
     # run GSI observer if in YAML
     validtime = yamlconfig['analysis cycle']['time']
+    validtime = datetime.datetime.strptime(validtime, '%Y-%m-%dT%H:00:00Z')
     if 'gsi observer' in yamlconfig:
         gsiconfig = yamlconfig['gsi observer']
         gsiconfig['validtime'] = validtime
         gsiconfig['dump'] = yamlconfig['analysis cycle']['dump']
         gsiconfig['rstprod'] = yamlconfig['analysis cycle']['restricted data']
         gsiconfig['cleanup'] = yamlconfig['cleanup']
+        gsiconfig['yamldir'] = yamlconfig['yamldir']
         # create YAML for GSI observer script
         gsiobsyaml = gen_gsi_observer_yaml(gsiconfig)
         print('GSI observer configuration YAML file written to: '+gsiobsyaml)
@@ -152,6 +154,7 @@ def main(yamlconfig):
         iodaconvconfig = yamlconfig['ioda-converters']
         iodaconvconfig['validtime'] = validtime
         iodaconvconfig['cleanup'] = yamlconfig['cleanup']
+        iodaconvconfig['yamldir'] = yamlconfig['yamldir']
         iodaconvyaml = gen_gsinc_iodaconv_yaml(iodaconvconfig)
         print('ioda-converter GSI ncdiag YAML written to: '+iodaconvyaml)
         if 'slurm' in iodaconvconfig: # only support slurm currently
@@ -168,6 +171,7 @@ def main(yamlconfig):
         jediconfig['dump'] = yamlconfig['analysis cycle']['dump']
         jediconfig['rstprod'] = yamlconfig['analysis cycle']['restricted data']
         jediconfig['cleanup'] = yamlconfig['cleanup']
+        jediconfig['yamldir'] = yamlconfig['yamldir']
         # create YAML for JEDI H(x) driver script
         jedihofxyaml = gen_fv3jedi_hofx_yaml(jediconfig)
         print('FV3-JEDI H(x) driver configuration YAML file written to: '+jedihofxyaml)
