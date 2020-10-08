@@ -3,7 +3,7 @@ DARTH:
   edate: 202110060000
   cycles: 4
   dump: gdas
-  comrot: /scratch2/NCEPDEV/stmp1/Cory.R.Martin
+  comrot: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/DARTH
   steps:
     - prep
     - gsiobserver
@@ -15,7 +15,7 @@ DARTH:
 
 # paths
 paths:
-  rootdir: /scratch1/NCEPDEV/stmp2/Cory.R.Martin/DARTH
+  rootdir: /scratch1/NCEPDEV/da/Cory.R.Martin/GitHub/DARTH/ 
   obsdir: /scratch1/NCEPDEV/rstprod/com/gfs/prod # global dump
   gsiroot: /scratch1/NCEPDEV/da/Cory.R.Martin/Workflows/GFSv16/sorc/gsi.fd
   jediroot: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/tropomi_ufo/fv3-bundle
