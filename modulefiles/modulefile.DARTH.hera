@@ -1,0 +1,4 @@
+module use -a /scratch2/NCEPDEV/marineda/Jong.Kim/save/modulefiles/
+module load anaconda/3.15.1
+module use -a /scratch2/NCEPDEV/nwprod/NCEPLIBS/modulefiles
+module load prod_util

@@ -54,9 +54,9 @@ def gen_gsi_observer_yaml(gsiconfig):
                                'restricted': gsiconfig['rstprod'],
     }
     yamlout['observer'] = {
-                           'workdir': '%s/%s' % (gsiconfig['gsiwork'],timestr),
+                           'workdir': '%s' % (gsiconfig['gsiwork']),
                            'gsidir': gsiconfig['gsidir'],
-                           'outputdir': '%s/%s' % (gsiconfig['gsiout'],timestr),
+                           'outputdir': '%s' % (gsiconfig['gsiout']),
                            'cleanup': gsiconfig['cleanup'],
     }
     yamlout['env'] = gsiconfig['env']
@@ -86,8 +86,8 @@ def gen_fv3jedi_hofx_yaml(jediconfig):
                                'restricted': jediconfig['rstprod'],
     }
     yamlout['hofx'] = {
-                           'workdir': '%s/%s' % (jediconfig['hofxwork'],timestr),
-                           'outputdir': '%s/%s' % (jediconfig['hofxout'],timestr),
+                           'workdir': '%s' % (jediconfig['hofxwork']),
+                           'outputdir': '%s' % (jediconfig['hofxout']),
                            'cleanup': jediconfig['cleanup'],
                            'executable': jediconfig['executable'],
                            'yamlfile': jediconfig['hofxwork'] + '/fv3jedi_hofx_nomodel_%s.yaml' % (timestr),
@@ -111,9 +111,9 @@ def gen_gsinc_iodaconv_yaml(iodaconvconfig):
                        'cycle': iodaconvconfig['validtime'].strftime('%H'),
     }
     yamlout['data'] = {
-                       'gsiindir': '%s/%s' % (iodaconvconfig['gsidiagdir'],timestr),
-                       'iodaoutdir': '%s/%s' % (iodaconvconfig['iodaout'],timestr),
-                       'iodaworkdir': '%s/%s' % (iodaconvconfig['iodaconvwork'],timestr),
+                       'gsiindir': '%s' % (iodaconvconfig['gsidiagdir']),
+                       'iodaoutdir': '%s' % (iodaconvconfig['iodaout']),
+                       'iodaworkdir': '%s' % (iodaconvconfig['iodaconvwork']),
     }
     yamlout['iodaconv'] = {
                        'iodaconvbin': iodaconvconfig['iodaconvbin'],
