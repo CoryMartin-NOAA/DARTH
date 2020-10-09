@@ -55,7 +55,7 @@ gsiobserver:
   maxtime: 00:30:00
 gsiiodaconv:
   nodes: 1
-  taskspernode: 24
+  taskspernode: 20
   maxtime: 00:30:00
 jedihofx:
   nodes: 1
@@ -63,5 +63,5 @@ jedihofx:
   maxtime: 00:30:00
 post:
   nodes: 1
-  taskspernode: 24
+  taskspernode: 20
   maxtime: 00:30:00
