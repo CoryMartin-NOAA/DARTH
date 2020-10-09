@@ -17,7 +17,7 @@ DARTH:
 # paths
 paths:
   rootdir: /scratch1/NCEPDEV/da/Cory.R.Martin/GitHub/DARTH/ 
-  obsdir: /scratch1/NCEPDEV/rstprod/com/gfs/prod # global dump
+  obsdir: /scratch1/NCEPDEV/global/glopara/dump/
   gsiroot: /scratch1/NCEPDEV/da/Cory.R.Martin/Workflows/GFSv16/sorc/gsi.fd
   jediroot: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/tropomi_ufo/fv3-bundle
   jedibin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/tropomi_ufo/fv3-bundle/build/bin

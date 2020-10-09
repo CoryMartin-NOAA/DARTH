@@ -145,7 +145,7 @@ $ncpc $cldcoef           ${crtm_coeffs}CloudCoeff.bin
 
 ## copy observations
 if [[ "$GSI_observations_restricted" = "true" ]]; then
-  $ncpl $datobsnr/${prefix_obs}.prepbufr                ./prepbufr
+  $ncpl $datobs/${prefix_obs}.prepbufr                ./prepbufr
 else
   $ncpl $datobs/${prefix_obs}.prepbufr.nr                ./prepbufr
 fi
