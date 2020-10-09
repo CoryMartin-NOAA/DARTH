@@ -34,8 +34,7 @@ mkdir -p $IODA_data_iodaoutdir
 
 #
 # run script
-python ./proc_gsi_ncdiag.py -n 24 -o $OutDir/obs -g $OutDir/geoval $OutDir/GSI_diags
-$IODA_iodaconv_iodaconvbin -n 24 -o $IODA_data_iodaoutdir $IODA_data_gsiindir
+$IODA_iodaconv_iodaconvbin -n 20 -o $IODA_data_iodaoutdir $IODA_data_gsiindir
 
 if [[ "$IODA_iodaconv_cleanup" = "true" ]]; then
   cd $IODA_data_iodaoutdir
