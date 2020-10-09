@@ -64,19 +64,25 @@ def create_entities(yamlconfig):
     strings.append('\t<!ENTITY INTERVAL "%02d:00:00">\n' % interval)
     strings.append('\t<!ENTITY TOPYAML "%s">\n' % yamlconfig['mypath'])
     strings.append('\t<!ENTITY ROTDIR "%s">\n' % yamlconfig['DARTH']['comrot'])
+    strings.append('\t<!ENTITY GESDIR "%s">\n' % yamlconfig['paths']['guessdir'])
     strings.append('\t<!ENTITY CDUMP "%s">\n' % yamlconfig['DARTH']['dump'])
     strings.append('\t<!ENTITY HOMEDARTH "%s">\n' % yamlconfig['paths']['rootdir'])
     strings.append('\t<!ENTITY JOBS_DIR "%s">\n' % (yamlconfig['paths']['rootdir']+'/jobs/rocoto'))
+    strings.append('\t<!ENTITY HPSSROOT "%s">\n' % (yamlconfig['paths']['hpssroot']))
+    strings.append('\t<!ENTITY STARTROOT "%s">\n' % (yamlconfig['paths']['startroot']))
     strings.append('\t<!-- Machine related entities -->\n')
     strings.append('\t<!ENTITY ACCOUNT    "%s">\n' % yamlconfig['account'])
     strings.append('\t<!ENTITY QUEUE      "%s">\n' % yamlconfig['queue'])
+    strings.append('\t<!ENTITY QUEUE_ARCH "%s">\n' % yamlconfig['queue_arch'])
+    if scheduler in ['slurm']:
+            strings.append('\t<!ENTITY PARTITION_ARCH "%s">\n' % yamlconfig['partition_arch'])
     if scheduler in ['slurm'] and machine in ['ORION']:
         strings.append('\t<!ENTITY PARTITION_BATCH "%s">\n' % yamlconfig['partition'])
     strings.append('\t<!ENTITY SCHEDULER  "%s">\n' % scheduler)
     strings.append('\t<!ENTITY ROOTWORK "%s">\n' % yamlconfig['paths']['rootdir'])
     strings.append('\n')
     strings.append('\t<!-- ROCOTO parameters that control workflow -->\n')
-    strings.append('\t<!ENTITY CYCLETHROTTLE "3">\n')
+    strings.append('\t<!ENTITY CYCLETHROTTLE "1">\n')
     strings.append('\t<!ENTITY TASKTHROTTLE  "25">\n')
     strings.append('\t<!ENTITY MAXTRIES      "2">\n')
     strings.append('\n')
@@ -95,6 +101,10 @@ def get_resource_xml(task, resourcedict):
     strings.append('\t<!ENTITY WALLTIME_%s_DARTH  "%s">\n' % (TASK, wtimestr))
     strings.append('\t<!ENTITY RESOURCES_%s_DARTH "%s">\n' % (TASK, resstr))
     strings.append('\t<!ENTITY NATIVE_%s_DARTH    "%s">\n' % (TASK, natstr))
+    if task == 'gethpss':
+        strings.append('\t<!ENTITY PARTITION_%s_DARTH "%s">\n' % (TASK, '&PARTITION_ARCH;'))
+        strings.append('\t<!ENTITY MEMORY_%s_DARTH    "%s">\n' % (TASK, resourcedict['memory']))
+    strings.append('\n')
     return ''.join(strings)
 
 def get_workflow_header():
@@ -117,18 +127,29 @@ def get_tasks_xml(tasks):
     if wfu.get_scheduler(wfu.detectMachine()) in ['slurm']:
         envars.append(rocoto.create_envar(name='SLURM_SET', value='YES'))
     envars.append(rocoto.create_envar(name='ROTDIR', value='&ROTDIR;'))
+    envars.append(rocoto.create_envar(name='GESDIR', value='&GESDIR;'))
     envars.append(rocoto.create_envar(name='HOMEDARTH', value='&HOMEDARTH;'))
     envars.append(rocoto.create_envar(name='TOPYAML', value='&TOPYAML;'))
     envars.append(rocoto.create_envar(name='CDUMP', value='&CDUMP;'))
     envars.append(rocoto.create_envar(name='CDATE', value='<cyclestr>@Y@m@d@H</cyclestr>'))
     envars.append(rocoto.create_envar(name='PDY', value='<cyclestr>@Y@m@d</cyclestr>'))
     envars.append(rocoto.create_envar(name='cyc', value='<cyclestr>@H</cyclestr>'))
+    envars.append(rocoto.create_envar(name='HPSSROOT', value='&HPSSROOT;'))
 
     dict_tasks = OrderedDict()
     for itask in tasks:
-        if itask == 'prep':
+        if itask == 'gethpss':
             deps = []
-            data = '&ROTDIR;/&CDUMP;.@Y@m@d/@H/atmos/gdas.t@Hz.atmf006.nc'
+            data = '&STARTROOT;/&CDUMP;.@Y@m@d/@H/gdas.t@Hz.prepbufr'
+            #data = '&STARTROOT;/&CDUMP;.@Y@m@d/@H/atmos/gdas.t@Hz.atmf006.nc'
+            dep_dict = {'type': 'data', 'data': data, 'offset': '01:18:00:00'}
+            deps.append(rocoto.add_dependency(dep_dict))
+            dependencies = rocoto.create_dependency(dep=deps)
+            task = wfu.create_wf_task('gethpss', cdump='DARTH', envar=envars, dependency=dependencies)
+            dict_tasks['DARTHgethpss'] = task
+        elif itask == 'prep':
+            deps = []
+            data = '&GESDIR;/&CDUMP;.@Y@m@d/@H/atmos/gdas.t@Hz.atmf006.nc'
             dep_dict = {'type': 'data', 'data': data, 'offset': '-&INTERVAL;'}
             deps.append(rocoto.add_dependency(dep_dict))
             dependencies = rocoto.create_dependency(dep=deps)
@@ -197,10 +218,11 @@ def create_workflow(yamlpath, xmlpath):
     # remove MEMORY
     for each_task in task_dict:
         temp_task_string = []
-        for each_line in re.split(r'(\s+)', task_dict[each_task]):
-            if 'memory' not in each_line:
-                temp_task_string.append(each_line)
-        task_dict[each_task] = ''.join(temp_task_string)
+        if not each_task == 'DARTHgethpss':
+            for each_line in re.split(r'(\s+)', task_dict[each_task]):
+                if 'memory' not in each_line:
+                    temp_task_string.append(each_line)
+            task_dict[each_task] = ''.join(temp_task_string)
 
     # loop through tasks
     taskresources = {}

@@ -429,7 +429,7 @@ cat gsiparm.anl
 
 ## run GSI observer
 export OMP_NUM_THREADS=$GSI_env_nthreads
-$APRUN_GSI ./gsi.x > gsi.stdout
+$APRUN_GSI ./gsi.x > gsi.stdout || exit 1
 
 ## cat diags
 ntype=3

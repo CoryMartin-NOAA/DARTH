@@ -9,7 +9,7 @@ source $HOMEDARTH/ush/load_modules_darth.sh || exit 1
 adate=${PDY}${cyc}
 
 # run the script for this job with the specified YAML
-$HOMEDARTH/scripts/run_gsi_observer.sh $ROTDIR/$adate/YAML/run_gsi_observer_${adate}.yaml
+$HOMEDARTH/scripts/run_gsi_observer.sh $ROTDIR/$adate/YAML/run_gsi_observer_${adate}.yaml || exit 1
 
 date
 echo "gsiobserver.sh completed"
