@@ -1,10 +1,11 @@
 DARTH:
-  sdate: 202010060000
-  edate: 202110060000
+  sdate: 202010070000
+  edate: 202110070000
   cycles: 4
   dump: gdas
   comrot: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/DARTH
   steps:
+    - gethpss
     - prep
     - gsiobserver
     - gsiiodaconv
@@ -16,13 +17,15 @@ DARTH:
 # paths
 paths:
   rootdir: /scratch1/NCEPDEV/da/Cory.R.Martin/GitHub/DARTH/ 
-  obsdir: /scratch1/NCEPDEV/rstprod/com/gfs/prod # global dump
+  obsdir: /scratch1/NCEPDEV/global/glopara/dump/
   gsiroot: /scratch1/NCEPDEV/da/Cory.R.Martin/Workflows/GFSv16/sorc/gsi.fd
   jediroot: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/tropomi_ufo/fv3-bundle
   jedibin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/tropomi_ufo/fv3-bundle/build/bin
   iodaconvbin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/ioda-converters/build/bin
   jedimodule: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/env_jedi_rh
   guessdir: /scratch1/NCEPDEV/stmp2/Cory.R.Martin/GFSv16para
+  hpssroot: /NCEPDEV/emc-global/5year/emc.glopara/WCOSS_D/gfsv16/v16rt2
+  startroot: /scratch1/NCEPDEV/rstprod/com/gfs/prod
 
 # model
 background:
@@ -33,9 +36,15 @@ background:
 
 # resources
 account: da-cpu
-queue: debug
+queue: batch
 queue_arch: service
 partition: orion
+partition_arch: service
+gethpss:
+  nodes: 1
+  taskspernode: 1
+  maxtime: 00:30:00
+  memory: 2048M
 prep:
   nodes: 1
   taskspernode: 1
