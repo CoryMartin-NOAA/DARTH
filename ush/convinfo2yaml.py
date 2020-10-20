@@ -48,9 +48,9 @@ def main(config):
         dictloop = {
                    'path': [diagfile],
                    'observation id': [int(typeint[i])],
-                   'qc flag': [0],
+                   'analysis use': [True],
                    'data type': [diagtype],
-                   'plot type': [figs],
+                   'plot type': figs,
                    }
         yamlout['diagnostic'].append({'conventional input': dictloop})
 
