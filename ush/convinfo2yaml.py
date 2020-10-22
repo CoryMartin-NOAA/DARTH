@@ -37,7 +37,6 @@ def main(config):
     figs = ['histogram', 'spatial']
 
     # loop through obtypes
-    print(diagfiles)
     for i in range(len(obtype)):
         # first get filename and verify it exists
         diagfile = config['diagdir'].rstrip('/') + '/diag_conv_' + obtype[i] + '_' + config['loop'] + '.' + config['cycle'] + '.nc4'

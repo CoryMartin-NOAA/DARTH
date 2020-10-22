@@ -99,6 +99,31 @@ def gen_fv3jedi_hofx_yaml(jediconfig):
         yaml.dump(yamlout, file, default_flow_style=False)
     return yamlpath
 
+def gen_post_yaml(postconfig):
+    timestr = postconfig['validtime'].strftime('%Y%m%d%H')
+    yamlpath = postconfig['yamldir'] + '/run_post_%s.yaml' % (timestr)
+    # set up an output dictionary, then use pyYAML to write it out
+    yamlout = {}
+    yamlout['time'] = {
+                       'year': postconfig['validtime'].strftime('%Y'),
+                       'month': postconfig['validtime'].strftime('%m'),
+                       'day': postconfig['validtime'].strftime('%d'),
+                       'cycle': postconfig['validtime'].strftime('%H'),
+    }
+    yamlout['paths'] = {
+                       'gsidiagdir': '%s' % (postconfig['gsidiagdir']),
+                       'gsidir': '%s' % (postconfig['gsidir']),
+                       'ufohofxdir': '%s' % (postconfig['hofxoutdir']),
+                       'postworkdir': '%s' % (postconfig['postwork']),
+                       'postoutdir': '%s' % (postconfig['postout']),
+    }
+    yamlout['env'] = postconfig['env']
+    yamlout['cleanup']: postconfig['cleanup'],
+    # TODO check if output directory exists, make it if not
+    with open(yamlpath, 'w') as file:
+        yaml.dump(yamlout, file, default_flow_style=False)
+    return yamlpath
+
 def gen_gsinc_iodaconv_yaml(iodaconvconfig):
     timestr = iodaconvconfig['validtime'].strftime('%Y%m%d%H')
     yamlpath = iodaconvconfig['yamldir'] + '/run_gsinc_iodaconv_%s.yaml' % (timestr)
@@ -183,7 +208,24 @@ def main(yamlconfig):
             slurmdict['validtime'] = validtime
             hofxbatch = gen_slurm_submit(slurmdict)
             print('FV3-JEDI H(x) sbatch submission file written to: '+hofxbatch)
-    # TODO add plotting / analysis things
+    if 'post' in yamlconfig:
+        postconfig = yamlconfig['post']
+        postconfig['validtime'] = validtime
+        postconfig['dump'] = yamlconfig['analysis cycle']['dump']
+        postconfig['cleanup'] = yamlconfig['cleanup']
+        postconfig['yamldir'] = yamlconfig['yamldir']
+        # create YAML for post processing driver script
+        postyaml = gen_post_yaml(postconfig)
+        print('PyGSI - GSI/UFO evaluation scripts YAML file written to: '+postyaml)
+        if 'slurm' in jediconfig:
+            slurmdict = jediconfig['slurm']
+            slurmdict['job'] = 'run_post'
+            slurmdict['jobyaml'] = jedihofxyaml
+            slurmdict['jobscript'] = rootdir + '/scripts/%s.sh' % (slurmdict['job'])
+            slurmdict['validtime'] = validtime
+            postbatch = gen_slurm_submit(slurmdict)
+            print('Post-processing sbatch submission file written to: '+postbatch)
+
 
 parser = argparse.ArgumentParser(description='Generate YAML, other scripts, etc.'+\
                                 ' to process a global analysis cycle and produce output')
