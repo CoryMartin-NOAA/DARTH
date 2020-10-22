@@ -85,6 +85,16 @@ def main(yamlconfig, adate, outfile):
             'iodaout': comrot+'/IODA/',
             'env': iodaenv,
     }
+    # YAML for the post processing job
+    postenv = {'modulefile': yamlconfig['paths']['pygsimodule']}
+    yamlout['post'] = {
+        'env': postenv,
+        'postwork': comrot+'/POST_work/',
+        'postout': comrot+'/verification/',
+        'gsidiagdir': comrot+'/GSI_out/',
+        'hofxoutdir': comrot+'/JEDI_hofx/',
+        'gsidir': yamlconfig['paths']['gsiroot'],
+    }
     # other misc things
     yamlout['cleanup'] = yamlconfig['DARTH']['cleanup']
     yamlout['yamldir'] = comrot + '/YAML/'

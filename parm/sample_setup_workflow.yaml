@@ -1,5 +1,5 @@
 DARTH:
-  sdate: 202010070000
+  sdate: 202010200000
   edate: 202110070000
   cycles: 4
   dump: gdas
@@ -16,13 +16,14 @@ DARTH:
 
 # paths
 paths:
-  rootdir: /scratch1/NCEPDEV/da/Cory.R.Martin/GitHub/DARTH/ 
+  rootdir: /scratch1/NCEPDEV/da/Cory.R.Martin/GitHub/DARTH/
   obsdir: /scratch1/NCEPDEV/global/glopara/dump/
   gsiroot: /scratch1/NCEPDEV/da/Cory.R.Martin/Workflows/GFSv16/sorc/gsi.fd
   jediroot: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/tropomi_ufo/fv3-bundle
   jedibin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/tropomi_ufo/fv3-bundle/build/bin
   iodaconvbin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/ioda-converters/build/bin
   jedimodule: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/env_jedi_rh
+  pygsimodule: /scratch1/NCEPDEV/da/Cory.R.Martin/GitHub/DARTH/sorc/PyGSI/modulefiles/modulefile.PyGSI.hera.bash
   guessdir: /scratch1/NCEPDEV/stmp2/Cory.R.Martin/GFSv16para
   hpssroot: /NCEPDEV/emc-global/5year/emc.glopara/WCOSS_D/gfsv16/v16rt2
   startroot: /scratch1/NCEPDEV/rstprod/com/gfs/prod

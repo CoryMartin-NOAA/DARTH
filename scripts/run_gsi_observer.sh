@@ -465,7 +465,7 @@ for loop in $loops; do
       for type in $(echo ${diagtype[n]}); do
          count=$(ls ${prefix}${type}_${loop}* | wc -l)
          if [ $count -gt 0 ]; then
-	          file=diag_${type}_${string}.${adate}_ensmean.nc4 # _ensmean is to work with python script
+	          file=diag_${type}_${string}.${adate}.nc4
 	          # note if the GSI utility is not working correctly, use the python version
 	          # same syntax is used to call it, just change what $nccat is
             $nccat -o $file ${prefix}${type}_${loop}.nc4 &
