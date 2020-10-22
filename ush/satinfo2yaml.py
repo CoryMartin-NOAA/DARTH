@@ -50,7 +50,7 @@ def main(config):
                    'channel': [int(channel[i])],
                    'qc flag': [0],
                    'data type': [diagtype],
-                   'plot type': [figs],
+                   'plot type': figs,
                    }
         yamlout['diagnostic'].append({'radiance input': dictloop})
 
