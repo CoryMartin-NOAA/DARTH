@@ -11,6 +11,7 @@ def main(config):
     # read in convinfo file
     obtype = [] # string used in the filename
     typeint = [] # integer value of observation type
+    subtypeint = [] # integer value of observation subtype
     obuse = [] # use 1, monitor -1
     cv = open(config['convinfo'])
     rdcv = csv.reader(filter(lambda row: row[0]!='!', cv))
@@ -19,6 +20,7 @@ def main(config):
             rowsplit = row[0].split()
             obtype.append(rowsplit[0])
             typeint.append(rowsplit[1])
+            subtypeint.append(rowsplit[2])
             obuse.append(rowsplit[3])
         except IndexError:
             pass # end of file
@@ -47,6 +49,7 @@ def main(config):
         dictloop = {
                    'path': [diagfile],
                    'observation id': [int(typeint[i])],
+                   'observation subtype': [int(subtypeint[i])],
                    'analysis use': [True],
                    'data type': [diagtype],
                    'plot type': figs,
