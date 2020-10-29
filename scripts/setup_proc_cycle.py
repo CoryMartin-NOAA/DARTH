@@ -118,7 +118,7 @@ def gen_post_yaml(postconfig):
                        'postoutdir': '%s' % (postconfig['postout']),
     }
     yamlout['env'] = postconfig['env']
-    yamlout['cleanup']: postconfig['cleanup'],
+    yamlout['cleanup'] = postconfig['cleanup']
     # TODO check if output directory exists, make it if not
     with open(yamlpath, 'w') as file:
         yaml.dump(yamlout, file, default_flow_style=False)
