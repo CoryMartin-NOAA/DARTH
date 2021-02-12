@@ -30,7 +30,7 @@ cd $JEDI_hofx_workdir
 ln -fs $JEDI_hofx_executable $JEDI_hofx_workdir/fv3jedi_hofx_nomodel.x
 
 ## generate runtime YAML
-$USHDIR/gen_yaml_fv3jedi_hofx_nomodel.py -y $JEDI_hofx_yamlfile
+$USHDIR/gen_yaml_fv3jedi_hofx_nomodel.py --configyaml $YAMLFILE
 
 ## link fix files
 mkdir -p $JEDI_hofx_workdir/Data/fv3files
