@@ -1,0 +1,9 @@
+obs space:
+  name: aircraft_tsen
+  obsdatain:
+    obsfile: placeholder
+  obsdataout:
+    obsfile: placeholder
+  simulated variables: [air_temperature]
+obs operator:
+  name: VertInterp

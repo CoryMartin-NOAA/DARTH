@@ -38,7 +38,7 @@ jedi hofx:
   env:
     launcher: "srun --export=ALL"
     nthreads: 1
-    modulefile: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/env_jedi_rh
+    modulefile: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/env_jedi_rh_new
   slurm:
     account: da-cpu
     queue: debug

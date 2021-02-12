@@ -36,6 +36,6 @@ $ncpl $HOFX_fix_fixfv3jedi/fieldsets/dynamics.yaml $HOFX_hofx_workdir/Data/field
 $ncpl $HOFX_fix_fixfv3jedi/fieldsets/ufo.yaml $HOFX_hofx_workdir/Data/fieldsets/ufo.yaml
 
 # link CRTM files
-$ncpl $CRTM_FIX $HOFX_hofx_workdir/Data/crtm
+$ncpl $HOFX_fix_fixcrtm $HOFX_hofx_workdir/Data/crtm
 
 exit 0

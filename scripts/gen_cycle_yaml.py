@@ -71,6 +71,7 @@ def main(yamlconfig, adate, outfile):
         'hofxout': comrot+'/JEDI_hofx/',
         'executable': yamlconfig['paths']['jedibin'] + '/fv3jedi_hofx_nomodel.x',
         'fixfv3jedi': yamlconfig['paths']['jediroot'] + '/fv3-jedi/test/Data',
+        'fixcrtm': yamlconfig['paths']['fixcrtm'],
     }
     # YAML for the conversion step
     iodaenv = {

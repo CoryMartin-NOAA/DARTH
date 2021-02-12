@@ -92,7 +92,10 @@ def gen_fv3jedi_hofx_yaml(jediconfig):
                            'executable': jediconfig['executable'],
                            'yamlfile': jediconfig['hofxwork'] + '/fv3jedi_hofx_nomodel_%s.yaml' % (timestr),
     }
-    yamlout['fix'] = { 'fixfv3jedi' : jediconfig['fixfv3jedi']}
+    yamlout['fix'] = {
+                      'fixfv3jedi' : jediconfig['fixfv3jedi'],
+                      'fixcrtm': jediconfig['fixcrtm'],
+                      }
     yamlout['env'] = jediconfig['env']
     # TODO check if output directory exists, make it if not
     with open(yamlpath, 'w') as file:
