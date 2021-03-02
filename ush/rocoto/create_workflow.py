@@ -75,13 +75,13 @@ def create_entities(yamlconfig):
     strings.append('\t<!ENTITY HPSSROOT "%s">\n' % (yamlconfig['paths']['hpssroot']))
     strings.append('\t<!ENTITY STARTROOT "%s">\n' % (yamlconfig['paths']['startroot']))
     if yamlconfig['background']['gfsv16']:
-        strings.appned('\t<!ENTITY ATMDIR "/atmos/">\n')
+        strings.append('\t<!ENTITY ATMDIR "/atmos/">\n')
     else:
-        strings.appned('\t<!ENTITY ATMDIR "/">\n')
+        strings.append('\t<!ENTITY ATMDIR "/">\n')
     if yamlconfig['background']['lam']:
-        strings.appned('\t<!ENTITY ATMFILE "dynf006.%s">\n' % (histformat))
+        strings.append('\t<!ENTITY ATMFILE "dynf006.%s">\n' % (histformat))
     else:
-        strings.appned('\t<!ENTITY ATMFILE "&CDUMP;t@Hz.atmf006.%s">\n' % (histformat))
+        strings.append('\t<!ENTITY ATMFILE "&CDUMP;t@Hz.atmf006.%s">\n' % (histformat))
     strings.append('\t<!-- Machine related entities -->\n')
     strings.append('\t<!ENTITY ACCOUNT    "%s">\n' % yamlconfig['account'])
     strings.append('\t<!ENTITY QUEUE      "%s">\n' % yamlconfig['queue'])
