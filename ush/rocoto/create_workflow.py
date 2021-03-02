@@ -79,9 +79,11 @@ def create_entities(yamlconfig):
     else:
         strings.append('\t<!ENTITY ATMDIR "/">\n')
     if yamlconfig['background']['lam']:
-        strings.append('\t<!ENTITY ATMFILE "dynf006.%s">\n' % (histformat))
+        strings.append('\t<!ENTITY ATMFILE "guess.tm00">\n')
+        strings.append('\t<!ENTITY RSTDIR "guess.tm00">\n')
     else:
         strings.append('\t<!ENTITY ATMFILE "&CDUMP;t@Hz.atmf006.%s">\n' % (histformat))
+        strings.append('\t<!ENTITY RSTDIR "RESTART">\n')
     strings.append('\t<!-- Machine related entities -->\n')
     strings.append('\t<!ENTITY ACCOUNT    "%s">\n' % yamlconfig['account'])
     strings.append('\t<!ENTITY QUEUE      "%s">\n' % yamlconfig['queue'])
@@ -188,7 +190,7 @@ def get_tasks_xml(tasks):
                 deps = []
                 dep_dict = {'type': 'task', 'name': 'DARTHgsiiodaconv'}
                 deps.append(rocoto.add_dependency(dep_dict))
-                data = '&GESDIR;/&CDUMP;.@Y@m@d/@H&ATMDIR;RESTART/'
+                data = '&GESDIR;/&CDUMP;.@Y@m@d/@H&ATMDIR;/&RSTDIR;'
                 dep_dict = {'type': 'data', 'data': data, 'offset': '-&INTERVAL;'}
                 deps.append(rocoto.add_dependency(dep_dict))
                 dependencies = rocoto.create_dependency(dep_condition='and', dep=deps)
@@ -198,7 +200,7 @@ def get_tasks_xml(tasks):
                 deps = []
                 dep_dict = {'type': 'task', 'name': 'DARTHgsiobserver'}
                 deps.append(rocoto.add_dependency(dep_dict))
-                data = '&GESDIR;/&CDUMP;.@Y@m@d/@H&ATMDIR;RESTART/'
+                data = '&GESDIR;/&CDUMP;.@Y@m@d/@H&ATMDIR;/&RSTDIR;'
                 dep_dict = {'type': 'data', 'data': data, 'offset': '-&INTERVAL;'}
                 deps.append(rocoto.add_dependency(dep_dict))
                 dependencies = rocoto.create_dependency(dep_condition='and', dep=deps)
