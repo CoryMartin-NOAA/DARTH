@@ -55,6 +55,10 @@ def create_entities(yamlconfig):
     machine = wfu.detectMachine()
     scheduler = wfu.get_scheduler(machine)
     interval = 24/int(yamlconfig['DARTH']['cycles'])
+    if yamlconfig['background']['format'] == 'netcdf':
+        histformat = 'nc'
+    else:
+        histformat = 'nemsio'
     strings = []
     strings.append('\n')
     strings.append('\t<!-- Experiment parameters such as name, starting, ending dates -->\n')
@@ -70,6 +74,16 @@ def create_entities(yamlconfig):
     strings.append('\t<!ENTITY JOBS_DIR "%s">\n' % (yamlconfig['paths']['rootdir']+'/jobs/rocoto'))
     strings.append('\t<!ENTITY HPSSROOT "%s">\n' % (yamlconfig['paths']['hpssroot']))
     strings.append('\t<!ENTITY STARTROOT "%s">\n' % (yamlconfig['paths']['startroot']))
+    if yamlconfig['background']['gfsv16']:
+        strings.append('\t<!ENTITY ATMDIR "/atmos/">\n')
+    else:
+        strings.append('\t<!ENTITY ATMDIR "/">\n')
+    if yamlconfig['background']['lam']:
+        strings.append('\t<!ENTITY ATMFILE "guess.tm00">\n')
+        strings.append('\t<!ENTITY RSTDIR "guess.tm00">\n')
+    else:
+        strings.append('\t<!ENTITY ATMFILE "&CDUMP;t@Hz.atmf006.%s">\n' % (histformat))
+        strings.append('\t<!ENTITY RSTDIR "RESTART">\n')
     strings.append('\t<!-- Machine related entities -->\n')
     strings.append('\t<!ENTITY ACCOUNT    "%s">\n' % yamlconfig['account'])
     strings.append('\t<!ENTITY QUEUE      "%s">\n' % yamlconfig['queue'])
@@ -140,8 +154,7 @@ def get_tasks_xml(tasks):
     for itask in tasks:
         if itask == 'gethpss':
             deps = []
-            data = '&STARTROOT;/&CDUMP;.@Y@m@d/@H/gdas.t@Hz.prepbufr'
-            #data = '&STARTROOT;/&CDUMP;.@Y@m@d/@H/atmos/gdas.t@Hz.atmf006.nc'
+            data = '&STARTROOT;/&CDUMP;.@Y@m@d/@H/&CDUMP;.t@Hz.prepbufr'
             dep_dict = {'type': 'data', 'data': data, 'offset': '01:18:00:00'}
             deps.append(rocoto.add_dependency(dep_dict))
             dependencies = rocoto.create_dependency(dep=deps)
@@ -149,7 +162,7 @@ def get_tasks_xml(tasks):
             dict_tasks['DARTHgethpss'] = task
         elif itask == 'prep':
             deps = []
-            data = '&GESDIR;/&CDUMP;.@Y@m@d/@H/atmos/gdas.t@Hz.atmf006.nc'
+            data = '&GESDIR;/&CDUMP;.@Y@m@d/@H&ATMDIR;&ATMFILE;'
             dep_dict = {'type': 'data', 'data': data, 'offset': '-&INTERVAL;'}
             deps.append(rocoto.add_dependency(dep_dict))
             dependencies = rocoto.create_dependency(dep=deps)
@@ -159,7 +172,10 @@ def get_tasks_xml(tasks):
             deps = []
             dep_dict = {'type': 'task', 'name': 'DARTHprep'}
             deps.append(rocoto.add_dependency(dep_dict))
-            dependencies = rocoto.create_dependency(dep=deps)
+            data = '&GESDIR;/&CDUMP;.@Y@m@d/@H&ATMDIR;&ATMFILE;'
+            dep_dict = {'type': 'data', 'data': data, 'offset': '-&INTERVAL;'}
+            deps.append(rocoto.add_dependency(dep_dict))
+            dependencies = rocoto.create_dependency(dep_condition='and', dep=deps)
             task = wfu.create_wf_task('gsiobserver', cdump='DARTH', envar=envars, dependency=dependencies)
             dict_tasks['DARTHgsiobserver'] = task
         elif itask == 'gsiiodaconv':
@@ -174,14 +190,20 @@ def get_tasks_xml(tasks):
                 deps = []
                 dep_dict = {'type': 'task', 'name': 'DARTHgsiiodaconv'}
                 deps.append(rocoto.add_dependency(dep_dict))
-                dependencies = rocoto.create_dependency(dep=deps)
+                data = '&GESDIR;/&CDUMP;.@Y@m@d/@H&ATMDIR;/&RSTDIR;'
+                dep_dict = {'type': 'data', 'data': data, 'offset': '-&INTERVAL;'}
+                deps.append(rocoto.add_dependency(dep_dict))
+                dependencies = rocoto.create_dependency(dep_condition='and', dep=deps)
                 task = wfu.create_wf_task('jedihofx', cdump='DARTH', envar=envars, dependency=dependencies)
                 dict_tasks['DARTHjedihofx'] = task
             else:
                 deps = []
                 dep_dict = {'type': 'task', 'name': 'DARTHgsiobserver'}
                 deps.append(rocoto.add_dependency(dep_dict))
-                dependencies = rocoto.create_dependency(dep=deps)
+                data = '&GESDIR;/&CDUMP;.@Y@m@d/@H&ATMDIR;/&RSTDIR;'
+                dep_dict = {'type': 'data', 'data': data, 'offset': '-&INTERVAL;'}
+                deps.append(rocoto.add_dependency(dep_dict))
+                dependencies = rocoto.create_dependency(dep_condition='and', dep=deps)
                 task = wfu.create_wf_task('jedihofx', cdump='DARTH', envar=envars, dependency=dependencies)
                 dict_tasks['DARTHjedihofx'] = task
         elif itask == 'post':
