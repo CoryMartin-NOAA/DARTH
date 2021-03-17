@@ -71,6 +71,7 @@ def main(configyamlfile):
                           }
     yamlout['forecasts'] = {
                            'datapath': 'Data/bkg/',
+                           'filetype: gfs',
                            'filename_core': rsttimes+'.fv_core.res.nc',
                            'filename_trcr': rsttimes+'.fv_tracer.res.nc',
                            'filename_sfcd': rsttimes+'.sfc_data.nc',
