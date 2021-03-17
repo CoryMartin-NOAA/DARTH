@@ -4,6 +4,7 @@
 # analysis cycle and subset of observations
 # cory.r.martin@noaa.gov
 set -x
+ulimit -s unlimited
 ## variable definitions
 SCRIPTDIR=`dirname "$0"`
 USHDIR=$SCRIPTDIR/../ush
@@ -36,7 +37,7 @@ export APRUN_GSI=$GSI_env_launcher
 
 ## variables for executables
 gsiexec=$GSIDIR/exec/global_gsi.x
-nccat=$GSIDIR/exec/nc_diag_cat_serial.x
+nccat=$GSIDIR/exec/ncdiag_cat.x
 NDATE=${NDATE:-`which ndate`}
 ncpc=/bin/cp
 ncpl="ln -fs"
