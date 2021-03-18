@@ -32,12 +32,13 @@ def main(yamlconfig, adate, outfile):
     # YAML for the GSI observer step
     bkgres = re.sub('[^0-9]','', yamlconfig['background']['res'])
     gsibkg = {
-             'jcap': int(bkgres) - 2,
+             'jcap': (2*int(bkgres)) - 2,
              'jcap_b': (2*int(bkgres)) - 2,
              'levs': yamlconfig['background']['levs'],
              'guessdir': yamlconfig['paths']['guessdir'],
              'format': yamlconfig['background']['format'],
              'gfsv16': yamlconfig['background']['gfsv16'],
+             'nhr': yamlconfig['background']['nhr'],
     }
     gsienv = {
              'launcher': launcher,
