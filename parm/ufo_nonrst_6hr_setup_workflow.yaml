@@ -5,7 +5,6 @@ DARTH:
   dump: gdas
   comrot: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/ROTDIRS/DARTH/nonrst_fh006/
   steps:
-    - getorion
     - prep
     - gsiobserver
     - gsiiodaconv
@@ -15,15 +14,14 @@ DARTH:
 # paths
 paths:
   rootdir: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/DARTH/
-  obsdir: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/GFS/bufr_dump/
+  obsdir: /work/noaa/rstprod/dump/
   gsiroot: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/global-workflow/sorc/gsi.fd/
   jediroot: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/regional_obs/fv3-bundle
   jedibin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/regional_obs/build/bin
   iodaconvbin: /work/noaa/da/Cory.R.Martin/noscrub/JEDI/tutorial_dec2020/build_ioda/bin
   jedimodule: /work/noaa/da/Cory.R.Martin/noscrub/JEDI/jedi_env_grubin_gcc
   pygsimodule: /scratch1/NCEPDEV/da/Cory.R.Martin/GitHub/DARTH/sorc/PyGSI/modulefiles/modulefile.PyGSI.hera.bash
-  guessdir: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/ROTDIRS/DARTH/guess/
-  guessarchdir: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/GFS/para/c768_v15ics_v16tag/
+  guessdir: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/GFS/para/c768_v15ics_v16tag/
   hpssroot: /NCEPDEV/emc-global/5year/emc.glopara/WCOSS_D/gfsv16/v16rt2
   startroot: /scratch1/NCEPDEV/rstprod/com/gfs/prod
   fixcrtm: /scratch2/NCEPDEV/nwprod/NCEPLIBS/fix/crtm_v2.3.0
