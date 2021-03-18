@@ -60,7 +60,7 @@ fixgsi=$GSIDIR/fix
 ushgsi=$GSIDIR/ush
 crtm_coeffs=./crtm_coeffs/
 datobs=$GSI_observations_obsdir/${GSI_observations_dump}.$PDYa/$cyca
-datges=$GSI_background_guessdir/${GSI_observations_dump}.$PDYg/$cycg/$atmos
+datges=$GSI_background_guessdir/$adate/${GSI_observations_dump}.$PDYg/$cycg/$atmos
 prefix_obs=${GSI_observations_dump}.t${cyca}z
 prefix_ges=${GSI_observations_dump}.t${cycg}z
 suffix=tm00.bufr_d
@@ -204,26 +204,33 @@ $ncpl $datges/${prefix_ges}.abias                   ./satbias_in
 $ncpl $datges/${prefix_ges}.abias_pc                ./satbias_pc
 $ncpl $datges/${prefix_ges}.abias_air               ./aircftbias_in
 
-$ncpl $datges/${prefix_ges}.sfcf003$SUFFIX          ./sfcf03
-$ncpl $datges/${prefix_ges}.sfcf004$SUFFIX          ./sfcf04
-$ncpl $datges/${prefix_ges}.sfcf005$SUFFIX          ./sfcf05
-$ncpl $datges/${prefix_ges}.sfcf006$SUFFIX          ./sfcf06
-$ncpl $datges/${prefix_ges}.sfcf007$SUFFIX          ./sfcf07
-$ncpl $datges/${prefix_ges}.sfcf008$SUFFIX          ./sfcf08
-$ncpl $datges/${prefix_ges}.sfcf009$SUFFIX          ./sfcf09
-
-$ncpl $datges/${prefix_ges}.atmf003$SUFFIX          ./sigf03
-$ncpl $datges/${prefix_ges}.atmf004$SUFFIX          ./sigf04
-$ncpl $datges/${prefix_ges}.atmf005$SUFFIX          ./sigf05
-$ncpl $datges/${prefix_ges}.atmf006$SUFFIX          ./sigf06
-$ncpl $datges/${prefix_ges}.atmf007$SUFFIX          ./sigf07
-$ncpl $datges/${prefix_ges}.atmf008$SUFFIX          ./sigf08
-$ncpl $datges/${prefix_ges}.atmf009$SUFFIX          ./sigf09
-
-if [ -f $datges/${prefix_ges}.atmf004$SUFFIX ]; then
-   nhr_obsbin=1
+nhr_obsbin=$GSI_background_nhr
+if [[ "$GSI_background_nhr" = "1" ]]; then
+  $ncpl $datges/${prefix_ges}.sfcf003$SUFFIX          ./sfcf03
+  $ncpl $datges/${prefix_ges}.sfcf004$SUFFIX          ./sfcf04
+  $ncpl $datges/${prefix_ges}.sfcf005$SUFFIX          ./sfcf05
+  $ncpl $datges/${prefix_ges}.sfcf006$SUFFIX          ./sfcf06
+  $ncpl $datges/${prefix_ges}.sfcf007$SUFFIX          ./sfcf07
+  $ncpl $datges/${prefix_ges}.sfcf008$SUFFIX          ./sfcf08
+  $ncpl $datges/${prefix_ges}.sfcf009$SUFFIX          ./sfcf09
+  $ncpl $datges/${prefix_ges}.atmf003$SUFFIX          ./sigf03
+  $ncpl $datges/${prefix_ges}.atmf004$SUFFIX          ./sigf04
+  $ncpl $datges/${prefix_ges}.atmf005$SUFFIX          ./sigf05
+  $ncpl $datges/${prefix_ges}.atmf006$SUFFIX          ./sigf06
+  $ncpl $datges/${prefix_ges}.atmf007$SUFFIX          ./sigf07
+  $ncpl $datges/${prefix_ges}.atmf008$SUFFIX          ./sigf08
+  $ncpl $datges/${prefix_ges}.atmf009$SUFFIX          ./sigf09
+elif [[ "$GSI_background_nhr" = "3" ]]; then
+  $ncpl $datges/${prefix_ges}.sfcf003$SUFFIX          ./sfcf03
+  $ncpl $datges/${prefix_ges}.atmf003$SUFFIX          ./sigf03
+  $ncpl $datges/${prefix_ges}.sfcf006$SUFFIX          ./sfcf06
+  $ncpl $datges/${prefix_ges}.atmf006$SUFFIX          ./sigf06
+  $ncpl $datges/${prefix_ges}.sfcf009$SUFFIX          ./sfcf09
+  $ncpl $datges/${prefix_ges}.atmf009$SUFFIX          ./sigf09
 else
-   nhr_obsbin=3
+  $ncpl $datges/${prefix_ges}.sfcf006$SUFFIX          ./sfcf06
+  $ncpl $datges/${prefix_ges}.atmf006$SUFFIX          ./sigf06
+   nhr_obsbin=6
 fi
 
 ## create GSI namelist

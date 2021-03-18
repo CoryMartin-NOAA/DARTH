@@ -1,30 +1,29 @@
 DARTH:
-  sdate: 202010200000
-  edate: 202110070000
+  sdate: 202012150000
+  edate: 202101130600
   cycles: 4
   dump: gdas
-  comrot: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/DARTH
+  comrot: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/ROTDIRS/DARTH/nonrst_fh006/
   steps:
-    - gethpss
+    - getorion
     - prep
     - gsiobserver
     - gsiiodaconv
-    - jedihofx
-    - post
   cleanup: true
-  rstprod: true
+  rstprod: false
 
 # paths
 paths:
-  rootdir: /scratch1/NCEPDEV/da/Cory.R.Martin/GitHub/DARTH/
-  obsdir: /scratch1/NCEPDEV/global/glopara/dump/
-  gsiroot: /scratch1/NCEPDEV/da/Cory.R.Martin/Workflows/GFSv16/sorc/gsi.fd
+  rootdir: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/DARTH/
+  obsdir: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/GFS/bufr_dump/
+  gsiroot: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/global-workflow/sorc/gsi.fd/
   jediroot: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/regional_obs/fv3-bundle
   jedibin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/dev/regional_obs/build/bin
-  iodaconvbin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/ioda-converters/build/bin
-  jedimodule: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/env_jedi_rh_new
+  iodaconvbin: /work/noaa/da/Cory.R.Martin/noscrub/JEDI/tutorial_dec2020/build_ioda/bin
+  jedimodule: /work/noaa/da/Cory.R.Martin/noscrub/JEDI/jedi_env_grubin_gcc
   pygsimodule: /scratch1/NCEPDEV/da/Cory.R.Martin/GitHub/DARTH/sorc/PyGSI/modulefiles/modulefile.PyGSI.hera.bash
-  guessdir: /scratch1/NCEPDEV/stmp2/Cory.R.Martin/GFSv16para
+  guessdir: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/ROTDIRS/DARTH/guess/
+  guessarchdir: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/GFS/para/c768_v15ics_v16tag/
   hpssroot: /NCEPDEV/emc-global/5year/emc.glopara/WCOSS_D/gfsv16/v16rt2
   startroot: /scratch1/NCEPDEV/rstprod/com/gfs/prod
   fixcrtm: /scratch2/NCEPDEV/nwprod/NCEPLIBS/fix/crtm_v2.3.0
@@ -34,9 +33,9 @@ background:
   gfsv16: true
   lam: false
   format: netcdf
-  levs: 127
+  levs: 64
   res: C768
-  nhr: 1
+  nhr: 6
 
 # resources
 account: da-cpu
@@ -54,8 +53,8 @@ prep:
   taskspernode: 1
   maxtime: 00:05:00
 gsiobserver:
-  nodes: 30
-  taskspernode: 8
+  nodes: 10
+  taskspernode: 10
   maxtime: 00:30:00
 gsiiodaconv:
   nodes: 1
