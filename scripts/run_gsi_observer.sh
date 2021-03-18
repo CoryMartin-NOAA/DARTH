@@ -60,6 +60,8 @@ fixgsi=$GSIDIR/fix
 ushgsi=$GSIDIR/ush
 crtm_coeffs=./crtm_coeffs/
 datobs=$GSI_observations_obsdir/${GSI_observations_dump}.$PDYa/$cyca
+datobsnr=$GSI_observations_obsdir/${GSI_observations_dump}nr.$PDYa/$cyca
+datobsur=$GSI_observations_obsdir/${GSI_observations_dump}ur.$PDYa/$cyca
 datges=$GSI_background_guessdir/$adate/${GSI_observations_dump}.$PDYg/$cycg/$atmos
 prefix_obs=${GSI_observations_dump}.t${cyca}z
 prefix_ges=${GSI_observations_dump}.t${cycg}z
@@ -147,11 +149,13 @@ $ncpc $cldcoef           ${crtm_coeffs}CloudCoeff.bin
 ## copy observations
 if [[ "$GSI_observations_restricted" = "true" ]]; then
   $ncpl $datobs/${prefix_obs}.prepbufr                ./prepbufr
+  $ncpl $datobs/${prefix_obs}.saphir.${suffix}       ./saphirbufr
+  $ncpl $datobs/${prefix_obs}.prepbufr.acft_profiles  ./prepbufr_profl
+  $ncpl $datobs/${prefix_obs}.nsstbufr                ./nsstbufr
 else
-  $ncpl $datobs/${prefix_obs}.prepbufr.nr                ./prepbufr
+  $ncpl $datobsur/${prefix_obs}.prepbufr                ./prepbufr
+  $ncpl $datobsur/${prefix_obs}.saphir.${suffix}       ./saphirbufr
 fi
-$ncpl $datobs/${prefix_obs}.prepbufr.acft_profiles  ./prepbufr_profl
-$ncpl $datobs/${prefix_obs}.nsstbufr                ./nsstbufr
 $ncpl $datobs/${prefix_obs}.gpsro.${suffix}         ./gpsrobufr
 $ncpl $datobs/${prefix_obs}.satwnd.${suffix}        ./satwndbufr
 $ncpl $datobs/${prefix_obs}.spssmi.${suffix}        ./ssmirrbufr
@@ -184,7 +188,6 @@ $ncpl $datobs/${prefix_obs}.crisf4.${suffix}        ./crisfsbufr
 $ncpl $datobs/${prefix_obs}.syndata.tcvitals.tm00   ./tcvitl
 $ncpl $datobs/${prefix_obs}.avcsam.${suffix}        ./avhambufr
 $ncpl $datobs/${prefix_obs}.avcspm.${suffix}        ./avhpmbufr
-$ncpl $datobs/${prefix_obs}.saphir.${suffix}.nr       ./saphirbufr
 $ncpl $datobs/${prefix_obs}.gmi1cr.${suffix}        ./gmibufr
 $ncpl $datobs/${prefix_obs}.esiasi.${suffix}        ./iasibufrears
 $ncpl $datobs/${prefix_obs}.hrs3db.${suffix}        ./hirs3bufr_db
