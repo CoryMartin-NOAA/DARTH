@@ -53,6 +53,7 @@ jedi hofx:
 
 ioda-converters:
   iodaconvbin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/ioda-converters/build/bin/proc_gsi_ncdiag.py
+  iodacombinebin: /scratch1/NCEPDEV/da/Cory.R.Martin/JEDI/ioda-converters/build/bin/combine_conv.py
   iodaconvwork: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/iodaconverters_test/work
   gsidiagdir: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/gsi_observer_test/output
   iodaout: /scratch2/NCEPDEV/stmp1/Cory.R.Martin/ioda/

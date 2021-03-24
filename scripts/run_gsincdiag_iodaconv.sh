@@ -33,8 +33,16 @@ rm -rf $IODA_data_iodaoutdir
 mkdir -p $IODA_data_iodaoutdir
 
 #
-# run script
+# run script to generate IODA obs files
 $IODA_iodaconv_iodaconvbin -n 20 -o $IODA_data_iodaoutdir $IODA_data_gsiindir
+
+# concatenate these files together
+adate=$IODA_time_year$IODA_time_month$IODA_time_day$IODA_time_cycle
+python $IODA_iodaconv_iodacombinebin -i $IODA_data_iodaoutdir/sfc_*.nc4 -o $IODA_data_iodaoutdir/sfc_obs_"$adate".nc4
+python $IODA_iodaconv_iodacombinebin -i $IODA_data_iodaoutdir/sfcship_*.nc4 -o $IODA_data_iodaoutdir/sfcship_obs_"$adate".nc4
+python $IODA_iodaconv_iodacombinebin -i $IODA_data_iodaoutdir/aircraft_*.nc4 -o $IODA_data_iodaoutdir/aircraft_obs_"$adate".nc4
+python $IODA_iodaconv_iodacombinebin -i $IODA_data_iodaoutdir/sondes_ps*.nc4 $IODA_data_iodaoutdir/sondes_q*.nc4 $IODA_data_iodaoutdir/sondes_tsen*.nc4 $IODA_data_iodaoutdir/sondes_uv*.nc4 -o $IODA_data_iodaoutdir/sondes_obs_"$adate".nc4
+python $IODA_iodaconv_iodacombinebin -i $IODA_data_iodaoutdir/sondes_ps*.nc4 $IODA_data_iodaoutdir/sondes_q*.nc4 $IODA_data_iodaoutdir/sondes_tv*.nc4 $IODA_data_iodaoutdir/sondes_uv*.nc4 -o $IODA_data_iodaoutdir/sondes_tvirt_obs_"$adate".nc4
 
 if [[ "$IODA_iodaconv_cleanup" = "true" ]]; then
   cd $IODA_data_iodaoutdir
