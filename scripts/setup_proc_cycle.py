@@ -142,6 +142,7 @@ def gen_gsinc_iodaconv_yaml(iodaconvconfig):
                        'gsiindir': '%s' % (iodaconvconfig['gsidiagdir']),
                        'iodaoutdir': '%s' % (iodaconvconfig['iodaout']),
                        'iodaworkdir': '%s' % (iodaconvconfig['iodaconvwork']),
+                       'restricted': iodaconvconfig['rstprod'],
     }
     yamlout['iodaconv'] = {
                        'iodaconvbin': iodaconvconfig['iodaconvbin'],
@@ -184,6 +185,7 @@ def main(yamlconfig):
         iodaconvconfig['validtime'] = validtime
         iodaconvconfig['cleanup'] = yamlconfig['cleanup']
         iodaconvconfig['yamldir'] = yamlconfig['yamldir']
+        iodaconvconfig['rstprod'] = yamlconfig['analysis cycle']['restricted data']
         iodaconvyaml = gen_gsinc_iodaconv_yaml(iodaconvconfig)
         print('ioda-converter GSI ncdiag YAML written to: '+iodaconvyaml)
         if 'slurm' in iodaconvconfig: # only support slurm currently

@@ -498,6 +498,13 @@ if [[ "$GSI_observer_cleanup" = "true" ]]; then
 fi
 mkdir -p $GSI_observer_outputdir
 mv diag_* $GSI_observer_outputdir
+
+## cannot let rstprod data become readable by all
+if [[ "$GSI_observations_restricted" = "true" ]]; then
+  chgrp rstprod $GSI_observer_outputdir/diag_*
+  chmod 640 $GSI_observer_outputdir/diag_*
+fi
+
 cp satbias_in ${GSI_observer_outputdir}/satbias.$gdate
 cp satbias_pc ${GSI_observer_outputdir}/satbias_pc.$gdate
 cp aircftbias_in ${GSI_observer_outputdir}/aircftbias.$gdate
