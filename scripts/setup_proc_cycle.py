@@ -145,6 +145,7 @@ def gen_gsinc_iodaconv_yaml(iodaconvconfig):
     }
     yamlout['iodaconv'] = {
                        'iodaconvbin': iodaconvconfig['iodaconvbin'],
+                       'iodacombinebin': iodaconvconfig['iodacombinebin'],
     }
     yamlout['env'] = iodaconvconfig['env']
     # TODO check if output directory exists, make it if not
