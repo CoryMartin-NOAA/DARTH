@@ -28,7 +28,9 @@ for date in dates:
         user_date_format=config.user_date_format,
         fc_date_rendering=config.fc_date_rendering,
         database=config.database,
-        source_file=f'{directory}/$(valid_date).coupler.res'
+        source_file=f'{directory}/$(valid_date).coupler.res',
+        full_report='yes',
+        report=f'store_meta_{date}.yaml'
         )
 
     # Archive the tile files
@@ -45,4 +47,6 @@ for date in dates:
         file_type=['fv_core.res', 'fv_srf_wnd.res', 'fv_tracer.res', 'phy_data', 'sfc_data'],
         tile=config.tiles,
         source_file=f'{directory}/$(valid_date).$(file_type).tile$(tile).nc'
+        full_report='yes',
+        report=f'store_{date}.yaml'
         )
