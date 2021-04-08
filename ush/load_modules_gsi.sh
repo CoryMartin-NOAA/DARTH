@@ -47,14 +47,14 @@ if [ ! -d $dir_modules ]; then
     exit 10
 fi
 
-if [ $target = wcoss_d ]; then
+if [ $target = wcoss_d -o $target = orion ]; then
     module purge
     module use -a $dir_modules
     module load modulefile.ProdGSI.$target
 elif [ $target = wcoss -o $target = gaea ]; then
     module purge
     module load $dir_modules/modulefile.ProdGSI.$target
-elif [ $target = hera -o $target = cheyenne -o $target = orion ]; then
+elif [ $target = hera -o $target = cheyenne ]; then
     module purge
     source $dir_modules/modulefile.ProdGSI.$target
 elif [ $target = wcoss_c ]; then
