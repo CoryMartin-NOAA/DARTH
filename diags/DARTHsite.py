@@ -21,3 +21,13 @@ def genNavPanel(cyclelist, templatefile, outfile):
                 for src, target in replacements.items():
                     line = line.replace(src,target)
                 htmlout.write(line)
+
+def genConvTable(cycle, outpath):
+    # generate HTML table of info on conventional data
+    htmlstr = ''
+    htmlstr = htmlstr + f'<html><h1>Conventional Data Summary for {cycle}</h1>'
+    # create massive table here from input dictionary
+    htmlstr = htmlstr + '</html>'
+    outfile = f'{outpath}/html/{cycle}_convtable.html'
+    with open(outfile, 'w') as htmlout:
+        htmlout.write(htmlstr)
