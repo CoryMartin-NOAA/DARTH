@@ -5,9 +5,13 @@ from solo.basic_files import mkdir
 from r2d2 import fetch, date_sequence
 import glob
 import os
-import DARTHsite
+#import DARTHsite
 from multiprocessing import Pool
 import ioda
+import numpy as np
+import matplotlib
+matplotlib.use('agg')
+import matplotlib.pyplot as plt
 
 logger = Logger('procCycle')
 config = Configuration('procCycle.yaml')
@@ -19,10 +23,40 @@ def procIodaDiag(config, diagpath):
     diag = ioda.Engines.HH.openFile(
         name = diagpath,
         mode = ioda.Engines.BackendOpenModes.Read_Only)
-    og = ioda.ObsGroup(diag)
+    dlp = ioda._ioda_python.DLP.DataLayoutPolicy.generate(
+        ioda._ioda_python.DLP.DataLayoutPolicy.Policies(0))
+    og = ioda.ObsGroup(diag, dlp)
     # get list of variables in file
     varlist = og.vars.list()
-    print(varlist)
+    obsvarlist = []
+    for v in varlist:
+        vsplit = v.split('@') # will probably need to change this later
+        try:
+            if vsplit[1] == 'hofx':
+                obsvarlist.append(vsplit[0])
+        except IndexError:
+            pass
+    # for each variable type, now create figures and make stats
+    # TODO fix this when brightness temp is 2D
+    for v in obsvarlist:
+        # get hofx from ufo and jedi
+        #iodavar = og.vars.open(f'{v}@hofx')
+        #hofxUFO = iodavar.readNPArray.float()
+        #iodavar = og.vars.open(f'{v}@GsiHofX')
+        #hofxGSI = iodavar.readNPArray.float()
+        # get qc values
+        iodavar = og.vars.open(f'{v}@EffectiveQC')
+        qcUFO = iodavar.readNPArray.int()
+        iodavar = og.vars.open(f'{v}@PreQC')
+        qcGSI = iodavar.readNPArray.int()
+        # get errors
+        iodavar = og.vars.open(f'{v}@EffectiveError')
+        errUFO = iodavar.readNPArray.float()
+        errUFO[errUFO > 9e36] = np.nan
+        iodavar = og.vars.open(f'{v}@GsiFinalObsError')
+        errGSI = iodavar.readNPArray.float()
+        errGSI[errGSI > 9e36] = np.nan
+
 
 def fetchDiags(config):
     # fetch diags from R2D2 to a working directory
@@ -49,7 +83,12 @@ def procCycle(config):
                                        Hour(config.cycle).format('%Y%m%d%H'),
                                        'diags', '*_hofx_*'))
     # TODO set up a multiprocessing pool to process each diag file in parallel
+    mkdir(os.path.join(config.stage, Hour(config.cycle).format('%Y%m%d%H'),
+                       'DARTH', 'html', 'figs'))
+    mkdir(os.path.join(config.stage, Hour(config.cycle).format('%Y%m%d%H'),
+                       'DARTH', 'html', 'stats'))
     for diag in diagFiles:
+        print(diag)
         procIodaDiag(config, diag)
 
 
