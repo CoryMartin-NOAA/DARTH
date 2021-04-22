@@ -22,11 +22,35 @@ def genNavPanel(cyclelist, templatefile, outfile):
                     line = line.replace(src,target)
                 htmlout.write(line)
 
-def genConvTable(cycle, outpath):
+def genDataRow(valuelist, minlist, maxlist):
+    # create a row of a table in HTML
+    # format color of row depending on value/content of column
+
+def genConvTable(cycle, ConvDict, outpath):
     # generate HTML table of info on conventional data
     htmlstr = ''
-    htmlstr = htmlstr + f'<html><h1>Conventional Data Summary for {cycle}</h1>'
-    # create massive table here from input dictionary
+    htmlstr = htmlstr + f'<html><h1>Conventional Data Summary for {cycle}</h1>\n'
+    htmlstr = htmlstr + '<style>table, th, td { border: 1px solid black; border-collapse: collapse;}</style>'
+    ## create massive table here from input dictionary
+    for ConvType, TypeDict in ConvDict.items():
+        # ConvType being sondes, sfc, etc.
+        # new table for each type
+        newline = f'<h2>{ConvType}</h2>\n'
+        htmlstr = ''.join((htmlstr, newline))
+        columns = TypeDict['columns']
+        minlist = TypeDict['threshold_min']
+        maxlist = TypeDict['threshold_max']
+        newline = '<table style="width:90%"><tr>\n'
+        htmlstr = ''.join((htmlstr, newline))
+        for col in columns:
+            htmlstr = htmlstr + f'<th>{col}</th>\n'
+        htmlstr = htmlstr + '</tr>\n'
+        for row, rowvalues in TypeDict.items():
+            if row in ['columns', 'threshold_min', 'threshold_max']:
+                continue
+            newline = genDataRow(rowvalues, minlist, maxlist)
+            htmlstr = htmlstr + newline
+        htmlstr = htmlstr + '</table>'
     htmlstr = htmlstr + '</html>'
     outfile = f'{outpath}/html/{cycle}_convtable.html'
     with open(outfile, 'w') as htmlout:
