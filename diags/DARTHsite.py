@@ -25,6 +25,7 @@ def genNavPanel(cyclelist, templatefile, outfile):
 def genDataRow(valuelist, minlist, maxlist):
     # create a row of a table in HTML
     # format color of row depending on value/content of column
+    print(valuelist)
 
 def genConvTable(cycle, ConvDict, outpath):
     # generate HTML table of info on conventional data

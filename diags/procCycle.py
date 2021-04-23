@@ -5,17 +5,27 @@ from solo.basic_files import mkdir
 from r2d2 import fetch, date_sequence
 import glob
 import os
-#import DARTHsite
+import DARTHsite
 from multiprocessing import Pool
 import ioda
 import numpy as np
 import matplotlib
+import pandas as pd
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
+from matplotlib import rcParams, ticker
+from sklearn.linear_model import LinearRegression
 
 logger = Logger('procCycle')
 config = Configuration('procCycle.yaml')
 nprocs = 40
+ozdiag = ['omps_npp']  # fill out later
+
+#set figure params one time only.
+rcParams['figure.subplot.left'] = 0.1
+rcParams['figure.subplot.top'] = 0.85
+rcParams['legend.fontsize'] = 12
+rcParams['axes.grid'] = True
 
 def procIodaDiag(config, diagpath):
     # read, plot, save output from IODA diag file
@@ -26,11 +36,19 @@ def procIodaDiag(config, diagpath):
     dlp = ioda._ioda_python.DLP.DataLayoutPolicy.generate(
         ioda._ioda_python.DLP.DataLayoutPolicy.Policies(0))
     og = ioda.ObsGroup(diag, dlp)
+    # get name of platform, etc.
+    diagpathbase = os.path.basename(diagpath).split('_')
+    obstype = '_'.join(diagpathbase[0:diagpathbase.index('hofx')])
+    if len(obstype.split('_')) > 1:
+        # either radiance or ozone
+        diagtype ='oz' if obstype in ozdiag else 'conv'
+    else:
+        diagtype = 'conv'
     # get list of variables in file
     varlist = og.vars.list()
     obsvarlist = []
     for v in varlist:
-        vsplit = v.split('@') # will probably need to change this later
+        vsplit = v.split('@')  # will probably need to change this later
         try:
             if vsplit[1] == 'hofx':
                 obsvarlist.append(vsplit[0])
@@ -39,30 +57,53 @@ def procIodaDiag(config, diagpath):
     # for each variable type, now create figures and make stats
     # TODO fix this when brightness temp is 2D
     for v in obsvarlist:
-        # get hofx from ufo and jedi
-        #iodavar = og.vars.open(f'{v}@hofx')
-        #hofxUFO = iodavar.readNPArray.float()
-        #iodavar = og.vars.open(f'{v}@GsiHofX')
-        #hofxGSI = iodavar.readNPArray.float()
-        # get qc values
-        iodavar = og.vars.open(f'{v}@EffectiveQC')
-        qcUFO = iodavar.readNPArray.int()
-        iodavar = og.vars.open(f'{v}@PreQC')
-        qcGSI = iodavar.readNPArray.int()
-        # get errors
-        iodavar = og.vars.open(f'{v}@EffectiveError')
-        errUFO = iodavar.readNPArray.float()
-        errUFO[errUFO > 9e36] = np.nan
-        iodavar = og.vars.open(f'{v}@GsiFinalObsError')
-        errGSI = iodavar.readNPArray.float()
-        errGSI[errGSI > 9e36] = np.nan
+        getvars = [
+            f'{v}@hofx',
+            f'{v}@GsiHofXBc',
+            f'{v}@EffectiveQC',
+            f'{v}@PreQC',
+            f'{v}@EffectiveError',
+            f'{v}@GsiFinalObsError',
+        ]
+        nlocs = np.arange(1, len(get_ioda_var(og, f'{v}@hofx'))+1)
+        dfDiag = pd.DataFrame(nlocs, columns=['nlocs'])
+        for gv in getvars:
+            dfDiag[gv] = get_ioda_var(og, gv)
+        # create scatter plot of H(x)
+        qc = dfDiag[dfDiag[f'{v}@GsiFinalObsError'].notnull()]
+        tmp = qc[[f'{v}@hofx', f'{v}@GsiHofXBc']].dropna()
+        outfig = os.path.join(config.stage,
+                              'DARTH', 'html', 'figs',
+                              Hour(config.cycle).format('%Y%m%d%H'),
+                              f'{obstype}_hofx_{v}_scatter.png',
+                              )
+        scatter_mdata = {
+            'title': f'{obstype} {v} H(x) Comparison',
+            'cycle': f'{config.cycle}',
+            'xlabel': 'GSI H(x)',
+            'ylabel': 'UFO H(x)',
+            'outfig': outfig,
+            }
+        gen_scatter(tmp[f'{v}@GsiHofXBc'], tmp[f'{v}@hofx'], scatter_mdata)
 
+def get_ioda_var(og, vname):
+    # get IODA var and return as numpy array
+    iodaVar = og.vars.open(vname)
+    if iodaVar.isA2(ioda._ioda_python.Types.float):
+        fillVal = iodaVar.atts.open('_FillValue').readDatum.float()
+        vdata = iodaVar.readNPArray.float()
+        vdata[vdata == fillVal] = np.nan
+    elif iodaVar.isA2(ioda._ioda_python.Types.int):
+        vdata = iodaVar.readNPArray.int()
+    else:
+        raise TypeError("Only float and int supported for now")
+    return vdata
 
 def fetchDiags(config):
     # fetch diags from R2D2 to a working directory
     window_start = Hour(config.cycle) - DateIncrement('PT3H')
     ymdh = Hour(config.cycle).format('%Y%m%d%H')
-    stagedir = f'{config.stage}/{ymdh}/diags'
+    stagedir = f'{config.stage}/diags/{ymdh}/'
     mkdir(stagedir)
     fetch(
         type='diag',
@@ -74,21 +115,53 @@ def fetchDiags(config):
         target_file=f'{stagedir}/$(obs_type)_hofx_{config.model}_$(date).nc4',
         )
 
+def _get_linear_regression(data1, data2):
+    """
+    Inputs:
+        data1 : data on the x axis
+        data2 : data on the y axis
+    """
+    x = np.array(data1).reshape((-1,1))
+    y = np.array(data2)
+    model = LinearRegression().fit(x, y)
+    r_sq = model.score(x,y)
+    intercept = model.intercept_
+    slope = model.coef_[0]
+    # This is the same as if you calculated y_pred
+    # by y_pred = slope * x + intercept
+    y_pred = model.predict(x)
+    return y_pred, r_sq, intercept, slope
+
+def gen_scatter(dfX, dfY, metadata):
+    # generate and save scatter plot
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot(111)
+    y_pred, r_sq, intercept, slope = _get_linear_regression(dfX, dfY)
+    plt.scatter(x=dfX, y =dfY, s=4, color='darkgray', label=f'n={dfX.count()}')
+    label = f'y = {slope:.4f}x + {intercept:.4f}\nR\u00b2 : {r_sq:.4f}'
+    plt.plot(dfX, y_pred, color='red', linewidth=1, label=label)
+    plt.legend(loc='upper left', fontsize=11)
+    plt.title(metadata['title'], loc='left')
+    plt.xlabel(metadata['xlabel'], fontsize=12)
+    plt.ylabel(metadata['ylabel'], fontsize=12)
+    plt.title(metadata['cycle'], loc='right', fontweight='semibold')
+    plt.savefig(metadata['outfig'], bbox_inches='tight', pad_inches=0.1)
+    plt.close()
+
 def procCycle(config):
     # process cycle of IODA diagnostic files
     # use R2D2 to stage diag files
     fetchDiags(config)
     # get list of diag files to process
-    diagFiles = glob.glob(os.path.join(config.stage,
+    diagFiles = glob.glob(os.path.join(config.stage, 'diags',
                                        Hour(config.cycle).format('%Y%m%d%H'),
-                                       'diags', '*_hofx_*'))
+                                       '*_hofx_*'))
     # TODO set up a multiprocessing pool to process each diag file in parallel
-    mkdir(os.path.join(config.stage, Hour(config.cycle).format('%Y%m%d%H'),
-                       'DARTH', 'html', 'figs'))
-    mkdir(os.path.join(config.stage, Hour(config.cycle).format('%Y%m%d%H'),
-                       'DARTH', 'html', 'stats'))
+    mkdir(os.path.join(config.stage, 'DARTH', 'html', 'figs',
+                       Hour(config.cycle).format('%Y%m%d%H')))
+    mkdir(os.path.join(config.stage, 'DARTH', 'html', 'stats',
+                       Hour(config.cycle).format('%Y%m%d%H')))
     for diag in diagFiles:
-        print(diag)
         procIodaDiag(config, diag)
 
 

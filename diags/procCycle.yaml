@@ -1,9 +1,10 @@
 stage: /work/noaa/stmp/cmartin/diags
 model: gfs
-experiment: a00c
+experiment: a00f
 cycle: 2020121700
 database: local
 obs_types:
 - sondes
 - sfc
 - sfcship
+- amsua_n19
