@@ -13,7 +13,9 @@ import matplotlib
 import pandas as pd
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
-from matplotlib import rcParams, ticker
+from matplotlib import rcParams, ticker, cm
+from matplotlib.colors import Normalize
+from scipy.interpolate import interpn
 from sklearn.linear_model import LinearRegression
 
 logger = Logger('procCycle')
@@ -137,16 +139,37 @@ def gen_scatter(dfX, dfY, metadata):
     fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(111)
     y_pred, r_sq, intercept, slope = _get_linear_regression(dfX, dfY)
-    plt.scatter(x=dfX, y =dfY, s=4, color='darkgray', label=f'n={dfX.count()}')
+    #plt.scatter(x=dfX, y =dfY, s=4, color='darkgray', label=f'n={dfX.count()}')
+    density_scatter(dfX.values, dfY.values, ax=ax, fig=fig, bins = [100,100], s=4, cmap='hot')
     label = f'y = {slope:.4f}x + {intercept:.4f}\nR\u00b2 : {r_sq:.4f}'
-    plt.plot(dfX, y_pred, color='red', linewidth=1, label=label)
+    plt.plot(dfX, y_pred, color='black', linewidth=1, label=label)
     plt.legend(loc='upper left', fontsize=11)
     plt.title(metadata['title'], loc='left')
     plt.xlabel(metadata['xlabel'], fontsize=12)
     plt.ylabel(metadata['ylabel'], fontsize=12)
     plt.title(metadata['cycle'], loc='right', fontweight='semibold')
     plt.savefig(metadata['outfig'], bbox_inches='tight', pad_inches=0.1)
-    plt.close()
+    plt.close('all')
+
+def density_scatter( x , y, ax=None, fig=None, sort = True, bins = 20, **kwargs )   :
+    """
+    Scatter plot colored by 2d histogram
+    """
+    if ax is None :
+        fig , ax = plt.subplots()
+    data , x_e, y_e = np.histogram2d( x, y, bins = bins, density = True )
+    z = interpn( ( 0.5*(x_e[1:] + x_e[:-1]) , 0.5*(y_e[1:]+y_e[:-1]) ) , data , np.vstack([x,y]).T , method = "splinef2d", bounds_error = False)
+    #To be sure to plot all data
+    z[np.where(np.isnan(z))] = 0.0
+    # Sort the points by density, so that the densest points are plotted last
+    if sort :
+        idx = z.argsort()
+        x, y, z = x[idx], y[idx], z[idx]
+    ax.scatter( x, y, c=z, **kwargs )
+    norm = Normalize(vmin = np.min(z), vmax = np.max(z))
+    #cbar = fig.colorbar(cm.ScalarMappable(norm = norm), ax=ax)
+    #cbar.ax.set_ylabel('Density')
+    return ax
 
 def procCycle(config):
     # process cycle of IODA diagnostic files
