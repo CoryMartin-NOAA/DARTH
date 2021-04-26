@@ -1,0 +1,453 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Home</title>
+<link href="https://www.emc.ncep.noaa.gov/users/verification/global/gfs/ops/main.css" rel="stylesheet" type="text/css" media="all" />
+<link href="https://www.emc.ncep.noaa.gov/users/verification/global/gfs/ops/fonts.css" rel="stylesheet" type="text/css" media="all" />
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://www.emc.ncep.noaa.gov/users/verification/global/gfs/ops/grid2grid/jquery-3.1.1.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+
+
+
+
+<body>
+<div id="pageTitle">
+JEDI-UFO Evaluation - {{SENSOR}}</div>
+<div class="page-menu"><div class="table">
+        <div class="element">
+                <span class="bold">Cycle:</span>
+                <select id="validtime" onchange="changeValidtime(this.value);"></select>
+        </div>
+        <div class="element">
+                <span class="bold">Channel:</span>
+                <select id="channel" onchange="changeChannel(this.value)"></select>
+        </div>
+</div></div>
+
+<!-- Middle menu -->
+<div class="page-middle" id="page-middle">
+Left/Right arrow keys = Change cycle | Up/Down arrow keys = Change channel
+</div>
+<!-- /Middle menu -->
+
+<div id="loading"><img style="width:100%" src="../../images/loading.png"></div>
+
+<!-- Image -->
+<div id="page-map">
+        <image name="map" style="width:100%">
+</div>
+
+<script type="text/javascript">
+//====================================================================================================^M
+//User-defined variables
+//====================================================================================================^M
+
+//Global variables
+var minFrame = 0; //Minimum frame for every variable
+var maxFrame = 1000; //Maximum frame for every variable
+var incrementFrame = 1; //Increment for every frame
+
+var startFrame = 0; //Starting frame
+
+var cycle = {{CYCLE1}};
+
+/*
+When constructing the URL below, DDD = domain, VVV = variable, LLL = level, SSS = season, Y = frame number.
+For X and Y, labeling one X or Y represents an integer (e.g. 0, 10, 20). Multiple of these represent a string
+format (e.g. XX = 00, 06, 12 --- XXX = 000, 006, 012).
+*/
+var url = "../../figs/CCC/{{SENSOR}}/{{SENSOR}}_hofx_brightness_temperature_NNN_scatter.png";
+/* var url = "https://www.emc.ncep.noaa.gov/gmb/yluo/naefs/VRFY_STATS/NCEP_NCEPb/DDDtLLL_VVV_SSS.gif"; */
+/* var url = "https://www.emc.ncep.noaa.gov/gmb/STATS_vsdbTTT/allmodel/daily/cor/cor_VVV_HGT_LLL_DDD.png";
+/* var url = "https://www.emc.ncep.noaa.gov/users/Alicia.Bentley/fv3gefs/2018030100/images/DDD/mean_diff/VVV_Y.png"; */
+
+//====================================================================================================^M
+//Add variables & domains
+//====================================================================================================^M
+
+var channels = [];
+var validtimes = [];
+
+{{CHANNELPUSH}}
+
+//channels.push({
+//        displayName: "1",
+//        name: "1",
+//});
+
+{{CYCLEPUSH}}
+
+//validtimes.push({
+//        displayName: "2020121500",
+//        name: "2020121500",
+//});
+
+//====================================================================================================^M
+//Initialize the page
+//====================================================================================================^M
+
+//function for keyboard controls
+document.onkeydown = keys;
+
+//Decare object containing data about the currently displayed map^M
+imageObj = {};
+
+//Initialize the page
+initialize();
+
+//Initialize the page
+function initialize(){
+
+        //Set image object based on default variables
+        imageObj = {
+                channel: "1",
+                validtime: "{{CYCLE1}}",
+        };
+
+        //Change variable based on passed argument, if any
+        var passed_channel = "";
+        if(passed_channel!=""){
+                if(searchByName(passed_channel,channels)>=0){
+                        imageObj.channel = passed_channel;
+                }
+        }
+
+        //populate channel and cycle arrays
+        populateMenu('channel');
+        populateMenu('validtime');
+
+        //Populate the frames arrays
+        frames = [];
+        for(i=minFrame;i<=maxFrame;i=i+incrementFrame){frames.push(i);}
+
+        //Predefine empty array for preloading images
+        for(i=0; i<validtimes.length; i++){
+                validtimes[i].images = [];
+                validtimes[i].loaded = [];
+        }
+
+        //Preload images and display map
+        preload(imageObj);
+        showImage();
+
+        //Update mobile display for swiping
+        updateMobile();
+
+}
+
+var xInit = null;
+var yInit = null;
+var xPos = null;
+var yPos = null;
+
+<!--
+
+/* ============================================================================================================= */
+/* Preloading & displaying functions */
+/* ============================================================================================================= */
+
+//Populate the dropdown menu with items
+function populateMenu(mode){
+    if(mode == 'channel'){
+            var element = document.getElementById("channel");
+            for(i = element.options.length - 1 ; i >= 0 ; i--){element.remove(i);}
+
+            for(i=0; i<channels.length; i++){
+                    var option = document.createElement("option");
+                    option.text = channels[i].displayName;
+                    option.value = channels[i].name;
+                    element.add(option);
+            }
+    }
+    else if(mode == 'validtime'){
+            var element = document.getElementById("validtime");
+            for(i = element.options.length - 1 ; i >= 0 ; i--){element.remove(i);}
+
+            for(i=0; i<validtimes.length; i++){
+                    var option = document.createElement("option");
+                    option.text = validtimes[i].displayName;
+                    option.value = validtimes[i].name;
+                    element.add(option);
+            }
+    }
+        element.style.fontSize = "16px";
+}
+
+//Format URL to the requested domain, variable, run & frame
+function getURL(channel,validtime){
+	var newurl = url.replace("NNN",channel);
+	newurl = newurl.replace("CCC",cycle);
+	return newurl;
+}
+
+//Search for a name within an object
+function searchByName(keyname, arr){
+    for (var i=0; i < arr.length; i++){
+        if (arr[i].name === keyname){
+            return i;
+        }
+    }
+	return -1;
+}
+
+//Display the current image object
+function showImage(){
+
+	//Variable index
+	var idx_cyc = searchByName(imageObj.validtime,validtimes);
+
+	//Update user on whether image is still loading
+	if(validtimes[idx_cyc].images[imageObj.frame].loaded == false){
+		document.getElementById('loading').style.display = "block";
+	}
+	else{
+		document.getElementById('loading').style.display = "none";
+		document.map.src = validtimes[idx_cyc].images[imageObj.frame].src;
+	}
+
+	//Update dropdown menus
+  document.getElementById("channel").selectedIndex = searchByName(imageObj.channel,channels);
+  document.getElementById("validtime").selectedIndex = searchByName(imageObj.validtime,validtimes);
+
+	//Update URL in address bar
+	generate_url();
+}
+
+//Preload images for the current run, variable & projection
+function preload(obj){
+
+	//Variable index
+	var idx_cyc = searchByName(obj.validtime,validtimes);
+
+	validtimes[idx_cyc].images[i] = [];
+
+	//Arrange list of hour indices to loop through
+	var frameidx = frames.indexOf(imageObj.frame);
+	var hrs_loop = [frameidx];
+
+	for(i=1; i<frames.length; i++){
+
+		var idx_up = frameidx + i;
+		var idx_down = frameidx - i;
+
+		if(idx_up<=frames.indexOf(maxFrame)){hrs_loop.push(idx_up);}
+		if(idx_down>=frames.indexOf(minFrame)){hrs_loop.push(idx_down);}
+	}
+
+	//Loop through all forecast hours & pre-load image
+	for (i2=0; i2<hrs_loop.length; i2++){
+		var i1 = hrs_loop[i2];
+		var i = frames[i1];
+
+		var urls = getURL(obj.channel,obj.validtime);
+
+		validtimes[idx_cyc].images[i] = new Image();
+		validtimes[idx_cyc].images[i].loaded = false;
+		validtimes[idx_cyc].images[i].id = i;
+		validtimes[idx_cyc].images[i].onload = function(){this.loaded = true; remove_loading(this.varid,this.id);};
+		validtimes[idx_cyc].images[i].onerror = function(){remove_loading(this.varid,this.id); this.src='https://www.emc.ncep.noaa.gov/users/verification/global/gfs/ops/images/noimage.png';};
+		validtimes[idx_cyc].images[i].src = urls;
+		validtimes[idx_cyc].images[i].validtime = obj.validtime;
+		validtimes[idx_cyc].images[i].varid = idx_cyc;
+    }
+}
+
+//Remove sign of loading image
+function remove_loading(idx_cyc,idx_frame){
+	check1a = parseInt(idx_cyc);
+	check1b = searchByName(imageObj.validtime,validtimes);
+	check2a = frames.indexOf(parseInt(idx_frame));
+	check2b = frames.indexOf(parseInt(imageObj.frame));
+
+	//Remove if the image just loaded for the currently displayed image
+	if((check1a == check1b) && (check2a == check2b)){
+		document.getElementById('loading').style.display = "none";
+		document.map.src = validtimes[idx_cyc].images[imageObj.frame].src;
+	}
+}
+
+/* ============================================================================================================= */
+/* Dropdown menu functions */
+/* ============================================================================================================= */
+
+//Change the map level from dropdown menu
+function changeChannel(id){
+        imageObj.channel = id;
+        preload(imageObj);
+        showImage();
+        document.getElementById("channel").blur();
+}
+
+//Change the map validtime from dropdown menu
+function changeValidtime(id){
+        imageObj.validtime = id;
+        preload(imageObj);
+        showImage();
+        document.getElementById("validtime").blur();
+}
+
+/* ============================================================================================================= */
+/* Keyboard controls */
+/* ============================================================================================================= */
+
+function keys(e){
+	//Left
+	if(e.keyCode == 37){
+		prevFrame();
+		return !(e.keyCode);
+	}
+	//Up
+	else if(e.keyCode == 38){
+		pressUp();
+		return !(e.keyCode);
+	}
+	//Right
+	else if(e.keyCode == 39){
+		nextFrame();
+		return !(e.keyCode);
+	}
+	//Down
+	else if(e.keyCode == 40){
+		pressDown();
+		return !(e.keyCode);
+	}
+}
+
+function prevFrame(){
+//	var curFrame = parseInt(imageObj.frame);
+//	if(curFrame > minFrame){curFrame = curFrame - incrementFrame;}
+//	changeValid(curFrame);
+	var curVar = searchByName(imageObj.validtime,validtimes);
+	if(curVar > 0){curVar = curVar - 1; changeValidtime(validtimes[curVar].name);}
+//	changeLevel(curFrame);
+}
+
+function nextFrame(){
+//	var curFrame = parseInt(imageObj.frame);
+//	if(curFrame < maxFrame){curFrame = curFrame + incrementFrame;}
+//	changeValid(curFrame);
+	var curVar = searchByName(imageObj.validtime,validtimes);
+	if(curVar < validtimes.length-1){curVar += 1; changeValidtime(validtimes[curVar].name);}
+}
+
+function pressDown(){
+	var curVar = searchByName(imageObj.channel,channels);
+	if(curVar < channels.length-1){curVar += 1; changeChannel(channels[curVar].name);}
+}
+
+function pressUp(){
+	var curVar = searchByName(imageObj.channel,channels);
+	if(curVar > 0){curVar = curVar - 1; changeChannel(channels[curVar].name);}
+}
+
+/* ============================================================================================================= */
+/* Additional functions */
+/* ============================================================================================================= */
+
+//Update the URL in the address bar by the current domain and variable
+function generate_url(){
+
+	var url = window.location.href.split('?')[0] + "?";
+	var append = "";
+
+	//Add channel
+	append += "channel=" + imageObj.channel;
+
+	//Add validtime
+	append += "&validtime=" + imageObj.validtime;
+
+	//Get new URL
+	var total = url + append;
+
+	//Update in address bar without reloading page
+	var pagename = window.location.href.split('/');
+	pagename = pagename[pagename.length-1];
+	pagename = pagename.split(".html")[0];
+	var stateObj = { foo: "bar" };
+	history.replaceState(stateObj, "", pagename+".html?"+append);
+
+	return total;
+}
+
+function updateMobile(){
+	if( navigator.userAgent.match(/Android/i)
+	|| navigator.userAgent.match(/webOS/i)
+	|| navigator.userAgent.match(/iPhone/i)
+	|| navigator.userAgent.match(/iPod/i)
+	//|| navigator.userAgent.match(/iPad/i)
+	|| navigator.userAgent.match(/BlackBerry/i)
+	|| navigator.userAgent.match(/Windows Phone/i)
+	){
+		document.getElementById('page-middle').innerHTML = "Swipe Left/Right on Image = Change forecast lead | Swipe Up/Down on Image = Change level";
+	}
+
+
+	//Swipe for mobile devices only when focused on image
+	var element = document.getElementsByName("map")[0];
+	element.addEventListener("touchstart", touchStart, false);
+	element.addEventListener("touchend", touchEnd, false);
+	element.addEventListener("touchmove", touchMove, false);
+
+}
+
+function touchStart(e){
+    xInit = e.touches[0].clientX;
+    yInit = e.touches[0].clientY;
+};
+
+function touchMove(e){
+	e.preventDefault();
+    xPos = e.touches[0].clientX;
+    yPos = e.touches[0].clientY;
+};
+
+function touchEnd() {
+    if ( ! xPos || ! yPos ) {
+        return;
+    }
+
+    //Get difference in x & y positions
+    var xDiff = xInit - xPos;
+    var yDiff = yInit - yPos;
+
+	//Determine whether swipe was vertical or horizontal
+    if ( Math.abs(xDiff) > Math.abs(yDiff) ){
+        if( xDiff > 0 ){
+            //Left swipe
+			nextFrame();
+        }
+		else{
+            //Right swipe
+			prevFrame();
+        }
+    }
+	else{
+        if ( yDiff > 0 ){
+            //Up swipe
+			pressDown();
+        }
+		else{
+            //Down swipe
+			pressUp();
+        }
+    }
+
+    //reset values
+    xInit = null;
+    yInit = null;
+	xPos = null;
+	yPos = null;
+};
+
+-->
+
+</script>
+
+</body>
+</html>
