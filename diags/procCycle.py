@@ -134,6 +134,20 @@ def _get_linear_regression(data1, data2):
     y_pred = model.predict(x)
     return y_pred, r_sq, intercept, slope
 
+def gen_lineplot(dfX, dfY, metadata):
+    # generate and save line plot
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot(111)
+    plt.plot(dfX, dfY, linestyle=metadata['linestyle'], linewidth=metadata['linewidth'],
+             color=metadata['color'], label=metadata['label'])
+    plt.legend(loc='upper left', fontsize=11)
+    plt.title(metadata['title'], loc='left')
+    plt.xlabel(metadata['xlabel'], fontsize=12)
+    plt.ylabel(metadata['ylabel'], fontsize=12)
+    plt.title(metadata['cycle'], loc='right', fontweight='semibold')
+    plt.savefig(metadata['outfig'], bbox_inches='tight', pad_inches=0.1)
+    plt.close('all')
+
 def gen_scatter(dfX, dfY, metadata):
     # generate and save scatter plot
     fig = plt.figure(figsize=(8, 6))

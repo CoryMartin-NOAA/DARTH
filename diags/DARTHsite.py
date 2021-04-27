@@ -5,91 +5,32 @@ import datetime
 
 ozdiag = ['omps_npp']  # fill out later
 
-def genConvPlotPage(cycledir, outfile):
-    # find all conventional plots in this directory, group them properly,
-    # and put them into a basic HTML page for viewing/clicking
-    cycle = os.path.basename(cycledir)
-    # get list of all png files
-    all_figs = glob.glob(os.path.join(cycledir,'*.png'))
-    sensors = []
-    for fig in all_figs:
-        figbase = os.path.basename(fig).split('_')
-        obtype = '_'.join(figbase[0:figbase.index('hofx')])
-        if len(obtype.split('_')) == 1:
-            if obtype not in sensors:
-                sensors.append(obtype)
-    # create initial header of HTML file
-    htmlstr = ''
-    htmlstr = htmlstr + f'<html><h1>Conventional observation figures for {cycle}</h1>\n'
-    # loop over sensors and types of figures and put into page
-    for sensor in sensors:
-        htmlstr = htmlstr + f'<br><h2>{sensor}</h2><br>\n'
-        # loop over types
-        for ptype in ['hofx']:
-            # get all figs matching
-            my_figs = sorted(glob.glob(os.path.join(cycledir,f'{sensor}_{ptype}_*.png')))
-            # start creating HTML
-            htmlstr = htmlstr + f'<h3>{ptype}</h3>\n'
-            nrow = 3
-            irow = 0
-            for fig in my_figs:
-                relpath = f'figs/{cycle}/{os.path.basename(fig)}'
-                href = f'<a href="{relpath}"><img src="{relpath}" style="width:300px; height:220px" title="{os.path.basename(fig)}"></a>\n'
-                htmlstr = htmlstr + href
-                irow = irow + 1
-                if irow == nrow:
-                    htmlstr = htmlstr + '<br>\n'
-                    irow = 0
-    # html footer
-    htmlstr = htmlstr + '</html>'
-    with open(outfile, 'w') as htmlout:
-        htmlout.write(htmlstr)
+def genConvPage(htmlfile, templatefile, cycles, cycledirs, obtype):
+    # generate main html page for each individual sensor
+    with open(templatefile) as htmlin:
+        # create javascript for all available cycles
+        cychtml = ''
+        for cyc in cycles:
+            cychtml = cychtml + f'validtimes.push({{displayName: "{cyc}", name: "{cyc}"}});\n'
+        # create javascript for all variables
+        varhtml = ''
+        my_figs = glob.glob(os.path.join(cycledirs[0],obtype,f'{obtype}_hofx_*_scatter.png'))
+        vars = sorted(['_'.join(os.path.basename(c).split('_')[2:-1]) for c in my_figs])
+        for v in vars:
+            varhtml = varhtml + f'channels.push({{displayName: "{v}", name: "{v}"}});\n'
+        replacements = {
+            '{{OBTYPE}}': obtype,
+            '{{CYCLEPUSH}}': cychtml,
+            '{{VARPUSH}}': varhtml,
+            '{{CYCLE1}}': cycles[0],
+        }
+        with open(htmlfile, 'w') as htmlout:
+            for line in htmlin:
+                for src, target in replacements.items():
+                    line = line.replace(src,target)
+                htmlout.write(line)
 
-def genRadPlotPage(cycledir, outfile):
-    # find all radiance plots in this directory, group them properly,
-    # and put them into a basic HTML page for viewing/clicking
-    cycle = os.path.basename(cycledir)
-    # get list of all png files
-    all_figs = glob.glob(os.path.join(cycledir,'*.png'))
-    sensors = []
-    for fig in all_figs:
-        figbase = os.path.basename(fig).split('_')
-        obtype = '_'.join(figbase[0:figbase.index('hofx')])
-        if len(obtype.split('_')) > 1:
-            if obtype not in ozdiag:
-                if obtype not in sensors:
-                    sensors.append(obtype)
-    # create initial header of HTML file
-    htmlstr = ''
-    htmlstr = htmlstr + f'<html><h1>Radiance observation figures for {cycle}</h1>\n'
-    # loop over sensors and types of figures and put into page
-    for sensor in sensors:
-        htmlstr = htmlstr + f'<br><h2>{sensor}</h2><br>\n'
-        # loop over types
-        for ptype in ['hofx']:
-            # get all figs matching
-            my_figs = glob.glob(os.path.join(cycledir,f'{sensor}_{ptype}_*.png'))
-            # sort by channel
-            chans = [int(os.path.basename(c).split('_')[-2]) for c in my_figs]
-            my_figs = [x for _, x in sorted(zip(chans, my_figs))]
-            # start creating HTML
-            htmlstr = htmlstr + f'<h3>{ptype}</h3>\n'
-            nrow = 3
-            irow = 0
-            for fig in my_figs:
-                relpath = f'figs/{cycle}/{os.path.basename(fig)}'
-                href = f'<a href="{relpath}"><img src="{relpath}" style="width:300px; height:220px" title="{os.path.basename(fig)}"></a>\n'
-                htmlstr = htmlstr + href
-                irow = irow + 1
-                if irow == nrow:
-                    htmlstr = htmlstr + '<br>\n'
-                    irow = 0
-    # html footer
-    htmlstr = htmlstr + '</html>'
-    with open(outfile, 'w') as htmlout:
-        htmlout.write(htmlstr)
-
-def genRadPage(htmlfile, templatefile, cycles, sensor):
+def genRadPage(htmlfile, templatefile, cycles, cycledirs, sensor):
     # generate main html page for each individual sensor
     with open(templatefile) as htmlin:
         # create javascript for all available cycles
@@ -98,7 +39,8 @@ def genRadPage(htmlfile, templatefile, cycles, sensor):
             cychtml = cychtml + f'validtimes.push({{displayName: "{cyc}", name: "{cyc}"}});\n'
         # create javascript for all channels
         chanhtml = ''
-        chans = []
+        my_figs = glob.glob(os.path.join(cycledirs[0],sensor,f'{sensor}_hofx_*_scatter.png'))
+        chans = sorted([int(os.path.basename(c).split('_')[-2]) for c in my_figs])
         for ch in chans:
             chanhtml = chanhtml + f'channels.push({{displayName: "{ch}", name: "{ch}"}});\n'
         replacements = {
@@ -151,6 +93,7 @@ def genRootIndex(htmldir, templatefile, cycledirs, expname):
             '{{OZLIST}}': oz_html,
             '{{CONTENTHTML}}': 'main.html',
             '{{HOMEPATH}}': '',
+            '{{PANELH}}': '700px',
         }
         outfile = os.path.join(htmldir, 'index.html')
         with open(outfile, 'w') as htmlout:
@@ -180,7 +123,8 @@ def genSensorIndex(htmlfile, templatefile, expname, mysensor, radlist, convlist,
             '{{CONVLIST}}': conv_html,
             '{{OZLIST}}': oz_html,
             '{{CONTENTHTML}}': f'{mysensor}.html',
-            '{{HOMEPATH}}': '../../index.html'
+            '{{HOMEPATH}}': '../../index.html',
+            '{{PANELH}}': '2000px',
         }
         with open(htmlfile, 'w') as htmlout:
             for line in htmlin:
@@ -198,6 +142,11 @@ def genSite(htmldir, templatedir, expname='evaltest'):
     if os.path.exists(main_html):
         os.remove(main_html)
     shutil.copy(os.path.join(templatedir,'main.html'), main_html)
+    # copy the javascript
+    main_js = os.path.join(htmldir,'functions_main.js')
+    if os.path.exists(main_js):
+        os.remove(main_js)
+    shutil.copy(os.path.join(templatedir,'functions_main.js'), main_js)
     # create top level index.html
     radlist, convlist, ozlist = genRootIndex(htmldir,
                                 os.path.join(templatedir,'index.html'),
@@ -205,12 +154,6 @@ def genSite(htmldir, templatedir, expname='evaltest'):
                                 expname,
                                 )
     # now for each rad, conv, oz sensor, make a directory/html pages
-    # if not os.path.exists(os.path.join(htmldir, 'rad')):
-    #     os.makedirs(os.path.join(htmldir, 'rad'))
-    # if not os.path.exists(os.path.join(htmldir, 'conv')):
-    #     os.makedirs(os.path.join(htmldir, 'conv'))
-    # if not os.path.exists(os.path.join(htmldir, 'oz')):
-    #     os.makedirs(os.path.join(htmldir, 'oz'))
     for rad in radlist:
         if not os.path.exists(os.path.join(htmldir, 'rad', rad)):
             os.makedirs(os.path.join(htmldir, 'rad', rad))
@@ -219,13 +162,16 @@ def genSite(htmldir, templatedir, expname='evaltest'):
                        expname, rad, radlist, convlist, ozlist)
         genRadPage(os.path.join(htmldir, 'rad', rad, f'{rad}.html'),
                    os.path.join(templatedir,'radmain.html'),
-                   cycles, rad)
+                   cycles, cycledirs, rad)
     for conv in convlist:
         if not os.path.exists(os.path.join(htmldir, 'conv', conv)):
             os.makedirs(os.path.join(htmldir, 'conv', conv))
         genSensorIndex(os.path.join(htmldir, 'conv', conv, 'index.html'),
                        os.path.join(templatedir,'index.html'),
                        expname, conv, radlist, convlist, ozlist)
+        genConvPage(os.path.join(htmldir, 'conv', conv, f'{conv}.html'),
+                   os.path.join(templatedir,'convmain.html'),
+                   cycles, cycledirs, conv)
     for oz in ozlist:
         if not os.path.exists(os.path.join(htmldir, 'oz', oz)):
             os.makedirs(os.path.join(htmldir, 'oz', oz))

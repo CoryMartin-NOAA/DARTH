@@ -14,14 +14,14 @@
 </head>
 <body>
 <div id="pageTitle">
-JEDI-UFO Evaluation - {{SENSOR}}</div>
+JEDI-UFO Evaluation - {{OBTYPE}}</div>
 <div class="page-menu"><div class="table">
         <div class="element">
                 <span class="bold">Cycle:</span>
                 <select id="validtime" onchange="changeValidtime(this.value);"></select>
         </div>
         <div class="element">
-                <span class="bold">Channel:</span>
+                <span class="bold">Variable:</span>
                 <select id="channel" onchange="changeChannel(this.value)"></select>
         </div>
 </div></div>
@@ -59,7 +59,7 @@ When constructing the URL below, DDD = domain, VVV = variable, LLL = level, SSS 
 For X and Y, labeling one X or Y represents an integer (e.g. 0, 10, 20). Multiple of these represent a string
 format (e.g. XX = 00, 06, 12 --- XXX = 000, 006, 012).
 */
-var url1 = "../../figs/CCC/{{SENSOR}}/{{SENSOR}}_hofx_brightness_temperature_NNN_scatter.png";
+var url1 = "../../figs/CCC/{{OBTYPE}}/{{OBTYPE}}_hofx_NNN_scatter.png";
 /* var url = "https://www.emc.ncep.noaa.gov/gmb/yluo/naefs/VRFY_STATS/NCEP_NCEPb/DDDtLLL_VVV_SSS.gif"; */
 /* var url = "https://www.emc.ncep.noaa.gov/gmb/STATS_vsdbTTT/allmodel/daily/cor/cor_VVV_HGT_LLL_DDD.png";
 /* var url = "https://www.emc.ncep.noaa.gov/users/Alicia.Bentley/fv3gefs/2018030100/images/DDD/mean_diff/VVV_Y.png"; */
@@ -71,7 +71,7 @@ var url1 = "../../figs/CCC/{{SENSOR}}/{{SENSOR}}_hofx_brightness_temperature_NNN
 var channels = [];
 var validtimes = [];
 
-{{CHANNELPUSH}}
+{{VARPUSH}}
 
 //channels.push({
 //        displayName: "1",
@@ -103,7 +103,7 @@ function initialize(){
 
         //Set image object based on default variables
         imageObj = {
-                channel: "1",
+                channel: "air_temperature",
                 validtime: "{{CYCLE1}}",
         };
 
