@@ -6,7 +6,7 @@ import datetime
 ozdiag = ['omps_npp']  # fill out later
 
 
-def genConvPage(htmlfile, templatefile, cycles, cycledirs, obtype):
+def gen_conv_page(htmlfile, templatefile, cycles, cycledirs, obtype):
     # generate main html page for each individual sensor
     with open(templatefile) as htmlin:
         # create javascript for all available cycles
@@ -36,7 +36,7 @@ def genConvPage(htmlfile, templatefile, cycles, cycledirs, obtype):
                 htmlout.write(line)
 
 
-def genRadPage(htmlfile, templatefile, cycles, cycledirs, sensor):
+def gen_rad_page(htmlfile, templatefile, cycles, cycledirs, sensor):
     # generate main html page for each individual sensor
     with open(templatefile) as htmlin:
         # create javascript for all available cycles
@@ -66,7 +66,7 @@ def genRadPage(htmlfile, templatefile, cycles, cycledirs, sensor):
                 htmlout.write(line)
 
 
-def genRootIndex(htmldir, templatefile, cycledirs, expname):
+def gen_root_index(htmldir, templatefile, cycledirs, expname):
     # create index.html for the top level page from a template
     with open(templatefile) as htmlin:
         # get list of all sensors in the cycledirs
@@ -119,7 +119,7 @@ def genRootIndex(htmldir, templatefile, cycledirs, expname):
     return radlist, convlist, ozlist
 
 
-def genSensorIndex(htmlfile, templatefile, expname, mysensor, radlist, convlist, ozlist):
+def gen_sensor_index(htmlfile, templatefile, expname, mysensor, radlist, convlist, ozlist):
     # creates index.html for the individual ob type pages
     with open(templatefile) as htmlin:
         # create HTML to replace in template
@@ -152,7 +152,7 @@ def genSensorIndex(htmlfile, templatefile, expname, mysensor, radlist, convlist,
                 htmlout.write(line)
 
 
-def genSite(htmldir, templatedir, expname='evaltest'):
+def gen_site(htmldir, templatedir, expname='evaltest'):
     # generate HTML for DARTH site depending on what figures, etc. are in htmldir
     # get list of cycles
     cycledirs = glob.glob(os.path.join(htmldir, 'figs', '*'))
@@ -168,7 +168,7 @@ def genSite(htmldir, templatedir, expname='evaltest'):
         os.remove(main_js)
     shutil.copy(os.path.join(templatedir, 'functions_main.js'), main_js)
     # create top level index.html
-    radlist, convlist, ozlist = genRootIndex(htmldir,
+    radlist, convlist, ozlist = gen_root_index(htmldir,
                                              os.path.join(
                                                  templatedir, 'index.html'),
                                              cycledirs,
@@ -178,24 +178,24 @@ def genSite(htmldir, templatedir, expname='evaltest'):
     for rad in radlist:
         if not os.path.exists(os.path.join(htmldir, 'rad', rad)):
             os.makedirs(os.path.join(htmldir, 'rad', rad))
-        genSensorIndex(os.path.join(htmldir, 'rad', rad, 'index.html'),
+        gen_sensor_index(os.path.join(htmldir, 'rad', rad, 'index.html'),
                        os.path.join(templatedir, 'index.html'),
                        expname, rad, radlist, convlist, ozlist)
-        genRadPage(os.path.join(htmldir, 'rad', rad, f'{rad}.html'),
+        gen_rad_page(os.path.join(htmldir, 'rad', rad, f'{rad}.html'),
                    os.path.join(templatedir, 'radmain.html'),
                    cycles, cycledirs, rad)
     for conv in convlist:
         if not os.path.exists(os.path.join(htmldir, 'conv', conv)):
             os.makedirs(os.path.join(htmldir, 'conv', conv))
-        genSensorIndex(os.path.join(htmldir, 'conv', conv, 'index.html'),
+        gen_sensor_index(os.path.join(htmldir, 'conv', conv, 'index.html'),
                        os.path.join(templatedir, 'index.html'),
                        expname, conv, radlist, convlist, ozlist)
-        genConvPage(os.path.join(htmldir, 'conv', conv, f'{conv}.html'),
+        gen_conv_page(os.path.join(htmldir, 'conv', conv, f'{conv}.html'),
                     os.path.join(templatedir, 'convmain.html'),
                     cycles, cycledirs, conv)
     for oz in ozlist:
         if not os.path.exists(os.path.join(htmldir, 'oz', oz)):
             os.makedirs(os.path.join(htmldir, 'oz', oz))
-        genSensorIndex(os.path.join(htmldir, 'oz', oz, 'index.html'),
+        gen_sensor_index(os.path.join(htmldir, 'oz', oz, 'index.html'),
                        os.path.join(templatedir, 'index.html'),
                        expname, oz, radlist, convlist, ozlist)

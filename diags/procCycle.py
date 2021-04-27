@@ -18,8 +18,8 @@ import matplotlib
 import pandas as pd
 matplotlib.use('agg')
 
-logger = Logger('procCycle')
-config = Configuration('procCycle.yaml')
+logger = Logger('proc_cycle')
+config = Configuration('proc_cycle.yaml')
 nprocs = 40
 ozdiag = ['omps_npp']  # fill out later
 
@@ -30,7 +30,7 @@ rcParams['legend.fontsize'] = 12
 rcParams['axes.grid'] = True
 
 
-def procIodaDiag(config, diagpath):
+def proc_ioda_diag(config, diagpath):
     # read, plot, save output from IODA diag file
     # open IODA file and obs group
     diag = ioda.Engines.HH.openFile(
@@ -104,7 +104,7 @@ def get_ioda_var(og, vname):
     return vdata
 
 
-def fetchDiags(config):
+def fetch_diags(config):
     # fetch diags from R2D2 to a working directory
     window_start = Hour(config.cycle) - DateIncrement('PT3H')
     ymdh = Hour(config.cycle).format('%Y%m%d%H')
@@ -195,10 +195,10 @@ def density_scatter(x, y, ax=None, fig=None, sort=True, bins=20, **kwargs):
     return ax
 
 
-def procCycle(config):
+def proc_cycle(config):
     # process cycle of IODA diagnostic files
     # use R2D2 to stage diag files
-    fetchDiags(config)
+    fetch_diags(config)
     # get list of diag files to process
     diagFiles = glob.glob(os.path.join(config.stage, 'diags',
                                        Hour(config.cycle).format('%Y%m%d%H'),
@@ -209,8 +209,8 @@ def procCycle(config):
     mkdir(os.path.join(config.stage, 'DARTH', 'html', 'stats',
                        Hour(config.cycle).format('%Y%m%d%H')))
     for diag in diagFiles:
-        procIodaDiag(config, diag)
+        proc_ioda_diag(config, diag)
 
 
 if __name__ == "__main__":
-    procCycle(config)
+    proc_cycle(config)
