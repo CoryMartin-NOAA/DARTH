@@ -77,9 +77,15 @@ def proc_ioda_diag(config, diagpath):
         # create scatter plot of H(x)
         qc = dfDiag[dfDiag[f'{v}@GsiFinalObsError'].notnull()]
         tmp = qc[[f'{v}@hofx', f'{v}@GsiHofXBc']].dropna()
+        # create output directory if it does not exist
+        mkdir(os.path.join(config.stage,
+                              'DARTH', 'html', 'figs',
+                              Hour(config.cycle).format('%Y%m%d%H'),
+                              f'{obstype}'))
         outfig = os.path.join(config.stage,
                               'DARTH', 'html', 'figs',
                               Hour(config.cycle).format('%Y%m%d%H'),
+                              f'{obstype}',
                               f'{obstype}_hofx_{v}_scatter.png',
                               )
         # scatter plot of H(x)
@@ -95,6 +101,7 @@ def proc_ioda_diag(config, diagpath):
         outfig = os.path.join(config.stage,
                               'DARTH', 'html', 'figs',
                               Hour(config.cycle).format('%Y%m%d%H'),
+                              f'{obstype}',
                               f'{obstype}_hofxdiff_{v}_line.png',
                               )
         line_mdata = {
