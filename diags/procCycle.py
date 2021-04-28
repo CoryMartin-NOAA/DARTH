@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from sklearn.linear_model import LinearRegression
 from scipy.interpolate import interpn
 from matplotlib.colors import Normalize

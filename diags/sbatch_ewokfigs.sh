@@ -55,15 +55,11 @@ obs_types:
 ${OBSTYPES}
 EOF
   # run procCycle
-  # todo: once procCycle has each diag in parallel, remove this pseudo parallel stuff below 
-  $PROCCYCLE ${ROOTWORK}/${EXPNAME}/${ICYCLE}_procCycle.yaml > ${ROOTWORK}/${EXPNAME}/${ICYCLE}.log 2>&1 &
-  sleep 10 # sleep 10 seconds before continuing in loop
+  $PROCCYCLE ${ROOTWORK}/${EXPNAME}/${ICYCLE}_procCycle.yaml
   # update time
   PDY=${ICYCLE::8} ; CYC=${ICYCLE:8}
   ICYCLE=$(date -d "$PDY ${CYC} + 6 hours" +%Y%m%d%H)
 done
-
-wait # wait for all python processes to end
 
 # generate website
 $GENSITE --htmldir ${ROOTWORK}/${EXPNAME}/DARTH/html --expnane ${EXPNAME}
