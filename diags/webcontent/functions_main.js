@@ -37,6 +37,11 @@ function getURL1(channel,validtime){
 	newurl = newurl.replace("CCC",cycle);
 	return newurl;
 }
+function getURL2(channel,validtime){
+	var newurl = url2.replace("NNN",channel);
+	newurl = newurl.replace("CCC",cycle);
+	return newurl;
+}
 
 //Search for a name within an object
 function searchByName(keyname, arr){
@@ -79,6 +84,7 @@ function preload(obj){
 	var idx_cyc = searchByName(obj.validtime,validtimes);
 
 	validtimes[idx_cyc].images[i] = [];
+  validtimes[idx_cyc].images2[i] = [];
 
 	//Arrange list of hour indices to loop through
 	var frameidx = frames.indexOf(imageObj.frame);
@@ -108,6 +114,17 @@ function preload(obj){
 		validtimes[idx_cyc].images[i].src = urls1;
 		validtimes[idx_cyc].images[i].validtime = obj.validtime;
 		validtimes[idx_cyc].images[i].varid = idx_cyc;
+
+    var urls2 = getURL2(obj.channel,obj.validtime);
+
+    validtimes[idx_cyc].images2[i] = new Image();
+    validtimes[idx_cyc].images2[i].loaded = false;
+    validtimes[idx_cyc].images2[i].id = i;
+    validtimes[idx_cyc].images2[i].onload = function(){this.loaded = true; remove_loading(this.varid,this.id);};
+    validtimes[idx_cyc].images2[i].onerror = function(){remove_loading(this.varid,this.id); this.src='https://www.emc.ncep.noaa.gov/users/verification/global/gfs/ops/images/noimage.png';};
+    validtimes[idx_cyc].images2[i].src = urls2;
+    validtimes[idx_cyc].images2[i].validtime = obj.validtime;
+    validtimes[idx_cyc].images2[i].varid = idx_cyc;
     }
 }
 
@@ -122,7 +139,7 @@ function remove_loading(idx_cyc,idx_frame){
 	if((check1a == check1b) && (check2a == check2b)){
 		document.getElementById('loading').style.display = "none";
 		document.map.src = validtimes[idx_cyc].images[imageObj.frame].src;
-    document.map2.src = validtimes[idx_cyc].images[imageObj.frame].src;
+    document.map2.src = validtimes[idx_cyc].images2[imageObj.frame].src;
 	}
 }
 

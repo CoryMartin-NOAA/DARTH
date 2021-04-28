@@ -54,15 +54,8 @@ var startFrame = 0; //Starting frame
 
 var cycle = {{CYCLE1}};
 
-/*
-When constructing the URL below, DDD = domain, VVV = variable, LLL = level, SSS = season, Y = frame number.
-For X and Y, labeling one X or Y represents an integer (e.g. 0, 10, 20). Multiple of these represent a string
-format (e.g. XX = 00, 06, 12 --- XXX = 000, 006, 012).
-*/
 var url1 = "../../figs/CCC/{{SENSOR}}/{{SENSOR}}_hofx_brightness_temperature_NNN_scatter.png";
-/* var url = "https://www.emc.ncep.noaa.gov/gmb/yluo/naefs/VRFY_STATS/NCEP_NCEPb/DDDtLLL_VVV_SSS.gif"; */
-/* var url = "https://www.emc.ncep.noaa.gov/gmb/STATS_vsdbTTT/allmodel/daily/cor/cor_VVV_HGT_LLL_DDD.png";
-/* var url = "https://www.emc.ncep.noaa.gov/users/Alicia.Bentley/fv3gefs/2018030100/images/DDD/mean_diff/VVV_Y.png"; */
+var url2 = "../../figs/CCC/{{SENSOR}}/{{SENSOR}}_hofxdiff_brightness_temperature_NNN_line.png";
 
 //====================================================================================================^M
 //Add variables & domains
@@ -126,6 +119,7 @@ function initialize(){
         //Predefine empty array for preloading images
         for(i=0; i<validtimes.length; i++){
                 validtimes[i].images = [];
+                validtimes[i].images2 = [];
                 validtimes[i].loaded = [];
         }
 

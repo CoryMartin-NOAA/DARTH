@@ -16,10 +16,11 @@ import ioda
 import numpy as np
 import matplotlib
 import pandas as pd
+import sys
 matplotlib.use('agg')
 
 logger = Logger('proc_cycle')
-config = Configuration('proc_cycle.yaml')
+config = Configuration(sys.argv[1])
 nprocs = 40
 ozdiag = ['omps_npp']  # fill out later
 
