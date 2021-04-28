@@ -1,0 +1,120 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>JEDI-GDAS Evaluation</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900" rel="stylesheet" />
+<link href="https://www.emc.ncep.noaa.gov/users/verification/style/default.css" rel="stylesheet" type="text/css" media="all" />
+<link href="https://www.emc.ncep.noaa.gov/users/verification/style/fonts.css" rel="stylesheet" type="text/css" media="all" />
+<!--[if IE 6]><link href="default_ie6.css" rel="stylesheet" type="text/css" /><![endif]-->
+</head>
+
+<script>
+function createDropdown(opt) {
+  /* When the user clicks on the button,
+     toggle between hiding and showing the dropdown content */
+  document.getElementById(opt.nextElementSibling.id).classList.toggle("show");
+}
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+  var oFrame = document.getElementById("body_frame");
+  oFrame.contentWindow.document.onclick = function() {
+        var i;
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        for (i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+  };
+  if (!event.target.matches('.dropbtn')) {
+      var dropdowns = document.getElementsByClassName("dropdown-content");
+      var i;
+      for (i = 0; i < dropdowns.length; i++) {
+          var openDropdown = dropdowns[i];
+          if (openDropdown.classList.contains('show')) {
+              openDropdown.classList.remove('show');
+          }
+      }
+  }
+  if (event.target.matches('.dropbtn')) {
+      var dropdowns = document.getElementsByClassName("dropdown-content");
+      var i;
+      for (i = 0; i < dropdowns.length; i++) {
+          var openDropdown = dropdowns[i];
+          if (event.target.nextElementSibling.id != openDropdown.id) {
+              if (openDropdown.classList.contains('show')) {
+                  openDropdown.classList.remove('show');
+               }
+          }
+      }
+  }
+}
+</script>
+
+<body>
+<div id="page" class="container">
+	<div id="header">
+		<div id="logo">
+			<img src="https://www.emc.ncep.noaa.gov/users/verification/style/images/noaa.png" alt="" width="100" />
+			<img src="https://www.emc.ncep.noaa.gov/users/verification/style/images/nws.png" alt="" width="100" />
+			<h1><font color="white">JEDI-GDAS<br>Evaluation</font></h1>
+      ><font color="white">{{EXPNAME}}</font>
+		</div>
+		<div id="menu">
+			<ul>
+                            <li class="current_page_item"><a href="{{HOMEPATH}}" accesskey="1" title="">HOME</a></li>
+                            <div class="dropdown">
+                                <button onclick="createDropdown(this)" class="dropbtn" accesskey="2">Radiance Obs &rsaquo;&rsaquo;</button>
+                                     <div id="Dropdown_rad" class="dropdown-content">
+                                         {{RADLIST}}
+                                     </div>
+                            </div>
+                            <div class="dropdown">
+                                <button onclick="createDropdown(this)" class="dropbtn" accesskey="3">Conventional Obs &rsaquo;&rsaquo;</button>
+                                     <div id="Dropdown_conv" class="dropdown-content">
+                                         {{CONVLIST}}
+                                     </div>
+                            </div>
+                            <div class="dropdown">
+                                <button onclick="createDropdown(this)" class="dropbtn" accesskey="4">Ozone Obs &rsaquo;&rsaquo;</button>
+                                     <div id="Dropdown_oz" class="dropdown-content">
+                                         {{OZLIST}}
+                                     </div>
+                            </div>
+                            <li><a href="https://www.emc.ncep.noaa.gov/data_assimilation/data.html" accesskey="5" title="">EMC DATA ASSIMILATION HOME</a></li>
+                            <li></li>
+                        </ul>
+		</div>
+	</div>
+	<div id="main">
+		<div id="banner">
+                    <iframe id="body_frame" src="{{CONTENTHTML}}" width="1100px" height="{{PANELH}}" style="border: 1px solid black;"></iframe>
+		</div>
+		<div id="welcome">
+			<p>This page displays evaluation content for Joint Effort for Data Assimilation (JEDI) acceptance for use in the NCEP Global Data Assimilation System (GDAS) </p>
+                        <p>DISCLAIMER: This web page is not "operational" and therefore not subject to 24-hr monitoring by NCEP's Central Operations staff.</p>
+		</div>
+                <div id="contact">
+                	<p><br><b>CONTACT INFORMATION</b><br>Cory.R.Martin@noaa.gov - Webmaster, JEDI-GDAS Verification<br>Daryl.Kleist@noaa.gov MDAB-DAQC Chief
+		</div>
+		<div id="footer">
+			<img src="https://www.emc.ncep.noaa.gov/users/verification/style/images/noaa.png" alt="" width="100" />
+			<img src="https://www.emc.ncep.noaa.gov/users/verification/style/images/nws.png" alt="" width="100" />
+			<img src="https://www.emc.ncep.noaa.gov/users/verification/style/images/commerce.png" alt="" width="100" />
+			<img src="https://www.emc.ncep.noaa.gov/users/verification/style/images/usagov.png" alt="" width="100" />
+			<br>
+			<a href="https://www.weather.gov/privacy">Privacy Policy</a> | <a href="https://www.weather.gov/disclaimer">Disclaimer</a> | <a href="https://www.commerce.gov">Department of Commerce</a> | <a href="https://www.noaa.gov">NOAA</a> | <a href="https://www.weather.gov">NWS</a> | <a href="https://www.ncep.noaa.gov">NCEP</a> | <a href="https://www.emc.ncep.noaa.gov">EMC</a>
+		</div>
+		<div id="copyright">
+		</div>
+	</div>
+</div>
+</body>
+</html>
