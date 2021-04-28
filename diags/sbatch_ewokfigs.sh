@@ -62,4 +62,4 @@ EOF
 done
 
 # generate website
-$GENSITE --htmldir ${ROOTWORK}/${EXPNAME}/DARTH/html --expnane ${EXPNAME}
+$GENSITE --htmldir ${ROOTWORK}/${EXPNAME}/DARTH/html --expname ${EXPNAME}

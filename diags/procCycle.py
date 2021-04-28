@@ -82,6 +82,7 @@ def proc_ioda_diag(config, diagpath):
                               Hour(config.cycle).format('%Y%m%d%H'),
                               f'{obstype}_hofx_{v}_scatter.png',
                               )
+        # scatter plot of H(x)
         scatter_mdata = {
             'title': f'{obstype} {v} H(x) Comparison',
             'cycle': f'{config.cycle}',
@@ -90,7 +91,26 @@ def proc_ioda_diag(config, diagpath):
             'outfig': outfig,
         }
         gen_scatter(tmp[f'{v}@GsiHofXBc'], tmp[f'{v}@hofx'], scatter_mdata)
-
+        # line plot of difference between H(x)
+        outfig = os.path.join(config.stage,
+                              'DARTH', 'html', 'figs',
+                              Hour(config.cycle).format('%Y%m%d%H'),
+                              f'{obstype}_hofxdiff_{v}_line.png',
+                              )
+        line_mdata = {
+            'title': f'{obstype} {v} H(x) Difference',
+            'cycle': f'{config.cycle}',
+            'xlabel': 'location',
+            'ylabel': 'UFO H(x) - GSI H(x)',
+            'outfig': outfig,
+            'linestyle': '-',
+            'linewidth': 1,
+            'color': 'red',
+            'label': 'UFO - GSI',
+        }
+        gen_lineplot(tmp[f'{v}@hofx'].index,
+                     tmp[f'{v}@hofx']-tmp[f'{v}@GsiHofXBc'],
+                     line_mdata)
 
 def get_ioda_var(og, vname):
     # get IODA var and return as numpy array
