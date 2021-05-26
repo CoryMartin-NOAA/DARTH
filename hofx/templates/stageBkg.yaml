@@ -1,0 +1,10 @@
+cycle: '{{current_cycle}}'
+forecast_steps: $(forecast_steps)
+window_length: $(window_length)
+bkg_exp: $(bkg_exp)
+bkg_db: $(bkg_db)
+bkg_dir: $(bkg_dir)
+bkg_tiles: $(bkg_tiles)
+model_resolution: $(model_resolution)
+experiment: $(experiment)
+experiment_dir: $(experiment_dir)

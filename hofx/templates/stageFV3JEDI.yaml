@@ -1,0 +1,5 @@
+stage_dir: $(stage_dir)
+model_resolution: $(model_resolution)
+vertical_resolution: $(vertical_resolution)
+fv3jedi_stage_files: $<< $(fv3jedi_stage)
+fv3jedi_stage: $(fv3jedi_stage)

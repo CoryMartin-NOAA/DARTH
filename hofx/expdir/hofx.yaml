@@ -1,0 +1,15 @@
+obs_list:
+- $<< $(bundle)/ufo/ewok/jedi-gdas/aircraft.yaml
+- $<< $(bundle)/ufo/ewok/jedi-gdas/amsua_n19.yaml
+obs_dir: $(experiment_dir)/{{cycle}}
+obs_db: ufo_eval_ref
+obs_dump: gdas_f006
+obs_src: ncdiag
+bc_src: gsi
+bc_dump: oper_gdas
+forecast_steps: [PT6H]
+bkg_exp: ufoeval
+bkg_db: ufo_eval_ref
+bkg_dir: $(experiment_dir)/{{cycle}}/RESTART
+bkg_tiles: [1,2,3,4,5,6]
+diag_db: local
