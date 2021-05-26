@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from solo.date import Hour, DateIncrement
 from solo.logger import Logger
 from solo.basic_files import mkdir
@@ -30,6 +29,8 @@ def stage_bkg(expdir):
         fc_date_rendering='analysis',
         database=config['bkg_db'],
         target_file=f"{config['bkg_dir']}/$(valid_date).coupler.res",
+        #full_report  = 'yes',
+        #report = f"fetch_gfs_metadata_{config['cycle']}.yaml",
     )
     # fetch the tile files
     fetch(
@@ -45,6 +46,8 @@ def stage_bkg(expdir):
         target_file=f"{config['bkg_dir']}/$(valid_date).$(file_type).tile$(tile).nc",
         tile=config['bkg_tiles'],
         file_type=['fv_core.res', 'fv_srf_wnd.res', 'fv_tracer.res', 'phy_data', 'sfc_data'],
+        #full_report  = 'yes',
+        #report = f"fetch_gfs_{config['cycle']}.yaml",
     )
 
 if __name__ == '__main__':

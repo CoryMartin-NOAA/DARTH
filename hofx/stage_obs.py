@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from solo.logger import Logger
 from solo.basic_files import mkdir
 from r2d2 import fetch
@@ -29,6 +28,8 @@ def stage_obs(expdir):
             target_file=outfile,
             ignore_missing=True,
             database=config['obs_db'],
+            #full_report  = 'yes',
+            #report = f"fetch_{obname}_{config['window begin']}.yaml",
         )
         # try to grab bias correction files too
         if 'obs bias' in ob:
@@ -43,6 +44,8 @@ def stage_obs(expdir):
                 file_type='satbias',
                 ignore_missing=True,
                 database=config['obs_db'],
+                #full_report  = 'yes',
+                #report = f"fetch_satbias_{obname}_{config['window begin']}.yaml",
             )
             # below is lazy but good for now...
             tlapse = satbias.replace('satbias.nc4', 'tlapse.txt')
@@ -56,6 +59,8 @@ def stage_obs(expdir):
                 file_type='tlapse',
                 ignore_missing=True,
                 database=config['obs_db'],
+                #full_report  = 'yes',
+                #report = f"fetch_tlapse_{obname}_{config['window begin']}.yaml",
             )
 
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from solo.logger import Logger
 import r2d2
 from genyaml import gen_yaml as get_config
@@ -49,7 +48,7 @@ def archive_HofX(expdir):
             source_file=output,
             database=config['archive_db'],
             #full_report='yes',
-            #report=f'store.yaml'
+            #report = f"archive_{obname}_{config['window begin']}.yaml",
         )
 
 if __name__ == '__main__':

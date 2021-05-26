@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from solo.logger import Logger
 from solo.configuration import Configuration
 from solo.template import TemplateConstants, Template

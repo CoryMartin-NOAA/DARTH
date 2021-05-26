@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from solo.logger import Logger
 from solo.basic_files import mkdir
 from solo.stage import Stage
