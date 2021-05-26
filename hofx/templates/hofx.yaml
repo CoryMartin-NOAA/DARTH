@@ -1,0 +1,6 @@
+window begin: '{{window_begin}}'
+window length: $(window_length)
+forecast length: $(fcst_length)
+geometry: $<< $(geom_inc)
+state: $<< $(state_inc)
+observations: $(obs_list)

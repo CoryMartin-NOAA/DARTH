@@ -1,0 +1,12 @@
+window_length: 'PT6H'
+fcst_length: 'PT6H'
+bundle: /work/noaa/da/cmartin/noscrub/JEDI/stable/fv3-bundle
+jedi_build: $(bundle)/build
+fv3jedi_stage: $(bundle)/fv3-jedi/ewok/gfs/stage.yaml
+experiment: UFS-test
+experiment_dir: /work/noaa/stmp/${USER}/$(experiment)
+stage_dir: $(experiment_dir)/stage
+geom_inc: $(bundle)/fv3-jedi/ewok/gfs/geometry_c768.yaml
+state_inc: $(bundle)/fv3-jedi/ewok/gfs/bg.yaml
+model_resolution: c768
+vertical_resolution: 64

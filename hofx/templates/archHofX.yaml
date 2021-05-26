@@ -1,0 +1,11 @@
+cycle: '{{current_cycle}}'
+window begin: '{{window_begin}}'
+window length: $(window_length)
+obs_src: $(obs_src)
+obs_dump: $(obs_dump)
+obs_dir: '{{obs_dir}}'
+observations: $(obs_list)
+obs_db: $(obs_db)
+experiment: $(experiment)
+experiment_dir: $(experiment_dir)
+archive_db: $(diag_db)
