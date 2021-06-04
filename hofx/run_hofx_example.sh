@@ -16,4 +16,6 @@ python stage_obs.py ./expdir
 python stage_fv3jedi.py ./expdir
 python genyaml.py hofx ./expdir /work/noaa/stmp/$USER/hofxyaml_testcycle.yaml
 srun -n6 $hofxexe /work/noaa/stmp/$USER/hofxyaml_testcycle.yaml
+python cat_hofx.py ./expdir
 python archive_hofx.py ./expdir
+python plot_hofx.py ./expdir
