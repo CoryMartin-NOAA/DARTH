@@ -44,6 +44,9 @@ python $IODA_iodaconv_iodacombinebin -i $IODA_data_iodaoutdir/aircraft_*.nc4 -o 
 python $IODA_iodaconv_iodacombinebin -i $IODA_data_iodaoutdir/sondes_ps*.nc4 $IODA_data_iodaoutdir/sondes_q*.nc4 $IODA_data_iodaoutdir/sondes_tsen*.nc4 $IODA_data_iodaoutdir/sondes_uv*.nc4 -o $IODA_data_iodaoutdir/sondes_obs_"$adate".nc4
 python $IODA_iodaconv_iodacombinebin -i $IODA_data_iodaoutdir/sondes_ps*.nc4 $IODA_data_iodaoutdir/sondes_q*.nc4 $IODA_data_iodaoutdir/sondes_tv*.nc4 $IODA_data_iodaoutdir/sondes_uv*.nc4 -o $IODA_data_iodaoutdir/sondes_tvirt_obs_"$adate".nc4
 
+# gnssro converter
+$IODA_iodaconv_iodaconvgnssrobin $IODA_data_gsiindir/diag_conv_gps_* $IODA_data_iodaoutdir/gnssro_${adate}.nc4
+
 if [[ "$IODA_data_restricted" = "true" ]]; then
   chgrp rstprod $IODA_data_iodaoutdir/*
   chmod 640 $IODA_data_iodaoutdir/*

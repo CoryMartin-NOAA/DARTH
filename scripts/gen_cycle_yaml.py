@@ -83,6 +83,7 @@ def main(yamlconfig, adate, outfile):
     yamlout['ioda-converters'] = {
             'iodaconvbin': yamlconfig['paths']['iodaconvbin'] + '/proc_gsi_ncdiag.py',
             'iodacombinebin': yamlconfig['paths']['iodaconvbin'] + '/combine_files.py',
+            'iodaconvgnssrobin': yamlconfig['paths']['iodaconvbin'] + '/gnssro_gsidiag2ioda',
             'iodaconvwork': comrot+'/IODA_work/',
             'gsidiagdir': comrot+'/GSI_out/',
             'iodaout': comrot+'/IODA/',
