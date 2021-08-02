@@ -3,7 +3,7 @@ DARTH:
   edate: 202101130600
   cycles: 4
   dump: gdas
-  comrot: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/ROTDIRS/DARTH/allobs_fh006_nonsstfov/
+  comrot: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/ROTDIRS/DARTH/allob_fh006_nonsstfov/
   steps:
     - prep
     - gsiobserver
@@ -53,7 +53,7 @@ prep:
 gsiobserver:
   nodes: 10
   taskspernode: 10
-  maxtime: 00:30:00
+  maxtime: 01:30:00
 gsiiodaconv:
   nodes: 1
   taskspernode: 20
