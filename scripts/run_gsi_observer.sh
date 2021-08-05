@@ -66,6 +66,8 @@ datges=$GSI_background_guessdir/$gdate/${GSI_observations_dump}.$PDYg/$cycg/$atm
 prefix_obs=${GSI_observations_dump}.t${cyca}z
 prefix_ges=${GSI_observations_dump}.t${cycg}z
 suffix=tm00.bufr_d
+# gps DO-1 obs
+gpsobs=/work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/GNSSRO_DO1/$PDYa$cyca/${GSI_observations_dump}/gpsrobufr
 
 ## netCDF or NEMSIO?
 if [[ "$GSI_background_format" = "netcdf" ]]; then
@@ -156,7 +158,12 @@ else
   $ncpl $datobsur/${prefix_obs}.prepbufr                ./prepbufr
   $ncpl $datobsur/${prefix_obs}.saphir.${suffix}       ./saphirbufr
 fi
-$ncpl $datobs/${prefix_obs}.gpsro.${suffix}         ./gpsrobufr
+# use GNSSRO obs with DO-1 included from Kristen if available
+if [[ -f "$gpsobs" ]]; then
+  $ncpl $gpsobs ./gpsrobufr
+else
+  $ncpl $datobs/${prefix_obs}.gpsro.${suffix}         ./gpsrobufr
+fi
 $ncpl $datobs/${prefix_obs}.satwnd.${suffix}        ./satwndbufr
 $ncpl $datobs/${prefix_obs}.spssmi.${suffix}        ./ssmirrbufr
 $ncpl $datobs/${prefix_obs}.sptrmm.${suffix}        ./tmirrbufr
