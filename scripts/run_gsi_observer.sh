@@ -271,7 +271,7 @@ cat > gsiparm.anl << EOF
 /
 &GRIDOPTS
   JCAP_B=$JCAP_B,JCAP=$JCAP,NLAT=$NLAT,NLON=$NLON,nsig=$LEVS,
-  regional=.false.,nlayers(63)=3,nlayers(64)=6,
+  regional=.false.,nlayers(63)=1,nlayers(64)=1,
   $GRIDOPTS
 /
 &BKGERR
