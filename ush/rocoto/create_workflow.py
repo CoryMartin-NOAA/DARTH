@@ -82,7 +82,7 @@ def create_entities(yamlconfig):
         strings.append('\t<!ENTITY ATMFILE "guess.tm00">\n')
         strings.append('\t<!ENTITY RSTDIR "guess.tm00">\n')
     else:
-        strings.append('\t<!ENTITY ATMFILE "&CDUMP;t@Hz.atmf006.%s">\n' % (histformat))
+        strings.append('\t<!ENTITY ATMFILE "&CDUMP;.t@Hz.atmf006.%s">\n' % (histformat))
         strings.append('\t<!ENTITY RSTDIR "RESTART">\n')
     strings.append('\t<!-- Machine related entities -->\n')
     strings.append('\t<!ENTITY ACCOUNT    "%s">\n' % yamlconfig['account'])
