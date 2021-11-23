@@ -162,7 +162,7 @@ def get_tasks_xml(tasks):
             dict_tasks['DARTHgethpss'] = task
         elif itask == 'prep':
             deps = []
-            data = '&GESDIR;/&CDUMP;.@Y@m@d/@H&ATMDIR;&ATMFILE;'
+            data = '&GESDIR;/@Y@m@d@H/&CDUMP;.@Y@m@d/@H&ATMDIR;&ATMFILE;'
             dep_dict = {'type': 'data', 'data': data, 'offset': '-&INTERVAL;'}
             deps.append(rocoto.add_dependency(dep_dict))
             dependencies = rocoto.create_dependency(dep=deps)
@@ -172,7 +172,7 @@ def get_tasks_xml(tasks):
             deps = []
             dep_dict = {'type': 'task', 'name': 'DARTHprep'}
             deps.append(rocoto.add_dependency(dep_dict))
-            data = '&GESDIR;/&CDUMP;.@Y@m@d/@H&ATMDIR;&ATMFILE;'
+            data = '&GESDIR;/@Y@m@d@H/&CDUMP;.@Y@m@d/@H&ATMDIR;&ATMFILE;'
             dep_dict = {'type': 'data', 'data': data, 'offset': '-&INTERVAL;'}
             deps.append(rocoto.add_dependency(dep_dict))
             dependencies = rocoto.create_dependency(dep_condition='and', dep=deps)
