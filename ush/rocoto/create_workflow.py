@@ -109,6 +109,8 @@ def get_resource_xml(task, resourcedict):
     tpp = 1
     resstr = f'<nodes>{nodes}:ppn={ppn}:tpp={tpp}</nodes>'
     natstr = "--export=NONE"
+    if task == 'gsiobserver':
+        natstr = "--mem=0"
     strings = []
     TASK = task.upper()
     strings.append('\t<!ENTITY QUEUE_%s_DARTH     "%s">\n' % (TASK, '&QUEUE;'))
