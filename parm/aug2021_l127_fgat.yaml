@@ -3,7 +3,7 @@ DARTH:
   edate: 202108071800
   cycles: 4
   dump: gdas
-  comrot: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/ROTDIRS/DARTH/fov_test/
+  comrot: /work2/noaa/da/cmartin/UFO_eval/data/ROTDIRS/aug2021_l127_fgat
   steps:
     - prep
     - gsiobserver
@@ -21,7 +21,7 @@ paths:
   iodaconvbin: /work2/noaa/da/cmartin/UFO_eval/ioda-bundle/build/bin
   jedimodule: /work2/noaa/da/cmartin/UFO_eval/DARTH/env/iodaconv.bash.orion
   pygsimodule: /scratch1/NCEPDEV/da/Cory.R.Martin/GitHub/DARTH/sorc/PyGSI/modulefiles/modulefile.PyGSI.hera.bash
-  guessdir: /work/noaa/da/Cory.R.Martin/noscrub/UFO_eval/GFS/para/c768_v15ics_v16tag/
+  guessdir: /work2/noaa/da/cmartin/UFO_eval/data/para/output_ufo_eval_aug2021
   hpssroot: /NCEPDEV/emc-global/5year/emc.glopara/WCOSS_D/gfsv16/v16rt2
   startroot: /scratch1/NCEPDEV/rstprod/com/gfs/prod
   fixcrtm: /scratch2/NCEPDEV/nwprod/NCEPLIBS/fix/crtm_v2.3.0
@@ -56,8 +56,8 @@ gsiobserver:
   maxtime: 01:30:00
 gsiiodaconv:
   nodes: 1
-  taskspernode: 20
-  maxtime: 00:30:00
+  taskspernode: 1
+  maxtime: 01:00:00
 jedihofx:
   nodes: 1
   taskspernode: 6
