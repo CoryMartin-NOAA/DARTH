@@ -62,7 +62,7 @@ crtm_coeffs=./crtm_coeffs/
 datobs=$GSI_observations_obsdir/${GSI_observations_dump}.$PDYa/$cyca
 datobsnr=$GSI_observations_obsdir/${GSI_observations_dump}nr.$PDYa/$cyca
 datobsur=$GSI_observations_obsdir/${GSI_observations_dump}ur.$PDYa/$cyca
-datges=$GSI_background_guessdir/$gdate/${GSI_observations_dump}.$PDYg/$cycg/$atmos
+datges=$GSI_background_guessdir/$adate/${GSI_observations_dump}.$PDYg/$cycg/$atmos
 prefix_obs=${GSI_observations_dump}.t${cyca}z
 prefix_ges=${GSI_observations_dump}.t${cycg}z
 suffix=tm00.bufr_d
@@ -90,6 +90,7 @@ satangl=$fixgsi/global_satangbias.txt
 pcpinfo=$fixgsi/global_pcpinfo.txt
 ozinfo=$fixgsi/global_ozinfo.txt
 convinfo=$fixgsi/global_convinfo.txt
+vqcdat=$fixgsi/vqctp001.dat
 insituinfo=$fixgsi/global_insituinfo.txt
 errtable=$fixgsi/prepobs_errtable.global
 aeroinfo=$fixgsi/global_aeroinfo.txt
@@ -124,6 +125,7 @@ $ncpc $scaninfo ./scaninfo
 $ncpc $pcpinfo  ./pcpinfo
 $ncpc $ozinfo   ./ozinfo
 $ncpc $convinfo ./convinfo
+$ncpc $vqcdat ./vqctp001.dat
 $ncpc $insituinfo ./insituinfo
 $ncpc $errtable ./errtable
 $ncpc $aeroinfo ./aeroinfo
@@ -251,12 +253,13 @@ cat > gsiparm.anl << EOF
   niter_no_qc(1)=50,niter_no_qc(2)=0,
   write_diag(1)=.true.,write_diag(2)=.false.,
   qoption=2,
-  gencode=0,deltim=$DELTIM,
+  gencode=0,deltim=94.,
   factqmin=0.5,factqmax=0.0002,
   iguess=-1,
   tzr_qc=1,
   oneobtest=.false.,retrieval=.false.,l_foto=.false.,
-  use_pbl=.false.,use_compress=.true.,nsig_ext=12,gpstop=50.,
+  use_pbl=.false.,use_compress=.true.,nsig_ext=56,gpstop=55.,commgpstop=45.,
+  thin4d=.true.,
   use_gfs_nemsio=${use_gfs_nemsio},use_gfs_ncio=${use_gfs_ncio},sfcnst_comb=.true.,
   use_readin_anl_sfcmask=.false.,
   lrun_subdirs=.true.,
@@ -297,8 +300,8 @@ cat > gsiparm.anl << EOF
   $STRONGOPTS
 /
 &OBSQC
-  dfact=0.75,dfact1=3.0,noiqc=.true.,oberrflg=.false.,c_varqc=0.02,
-  use_poq7=.true.,qc_noirjaco3_pole=.true.,vqc=.true.,nvqc=.false.,
+  dfact=0.75,dfact1=3.0,noiqc=.true.,oberrflg=.false.,c_varqc=0.04,
+  use_poq7=.true.,qc_noirjaco3_pole=.true.,vqc=.false.,nvqc=.true.,
   aircraft_t_bc=.true.,biaspredt=1.0e5,upd_aircraft=.true.,cleanup_tail=.true.,
   tcp_width=70.0,tcp_ermax=7.35,
   $OBSQC
